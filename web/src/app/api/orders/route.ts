@@ -1,0 +1,68 @@
+import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { normalizeReportType, normalizeTurnaround, computeSlaDueAt } from "@/lib/orders";
+
+/** GET /api/orders — list the signed-in user's orders (newest first). */
+export async function GET() {
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
+  }
+
+  const orders = await prisma.order.findMany({
+    where: { userId: session.user.id },
+    orderBy: { createdAt: "desc" },
+    include: { deliverables: true },
+  });
+
+  return NextResponse.json({ orders });
+}
+
+/** POST /api/orders — create a new order for the signed-in user. */
+export async function POST(req: NextRequest) {
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
+  }
+
+  const body = await req.json().catch(() => null);
+  if (!body) {
+    return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
+  }
+
+  const {
+    address,
+    city,
+    unit,
+    rtype,
+    turnaround,
+    notes,
+  } = body as Record<string, string | undefined>;
+
+  if (!address || address.trim().length < 4) {
+    return NextResponse.json({ error: "A valid street address is required." }, { status: 400 });
+  }
+
+  const reportType = normalizeReportType(rtype ?? "residential");
+  const turn = normalizeTurnaround(turnaround ?? "standard");
+  const now = new Date();
+
+  const fullAddress = [address.trim(), unit?.trim(), city?.trim()]
+    .filter(Boolean)
+    .join(", ");
+
+  const order = await prisma.order.create({
+    data: {
+      userId: session.user.id,
+      status: "PENDING",
+      address: fullAddress,
+      reportType,
+      turnaround: turn,
+      notes: notes?.trim() || null,
+      slaDueAt: computeSlaDueAt(turn, now),
+    },
+  });
+
+  return NextResponse.json({ order }, { status: 201 });
+}

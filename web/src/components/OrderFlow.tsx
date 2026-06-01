@@ -123,36 +123,37 @@ export function OrderFlow({ open, onClose }: { open: boolean; onClose: () => voi
     }
   };
 
-  const submit = () => {
+  const submit = async () => {
     setPhase("modeling");
-    // Submit to Netlify Forms (no-op locally; captured once deployed on Netlify)
     try {
-      const payload: Record<string, string> = {
-        "form-name": "roof-report-order",
-        "bot-field": "",
-        reportId: reportId.current,
-        address: data.address,
-        city: data.city,
-        unit: data.unit,
-        reportType: (RTYPES[data.rtype] || {}).label || data.rtype,
-        turnaround: (TURN[data.turnaround] || {}).label || data.turnaround,
-        name: data.name,
-        company: data.company,
-        email: data.email,
-        phone: data.phone,
-        notes: data.notes,
-      };
-      const body = Object.keys(payload)
-        .map((k) => encodeURIComponent(k) + "=" + encodeURIComponent(payload[k] || ""))
-        .join("&");
-      fetch("/", {
+      const res = await fetch("/api/orders", {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body,
-      }).catch(() => {});
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          address: data.address,
+          city: data.city,
+          unit: data.unit,
+          rtype: data.rtype,
+          turnaround: data.turnaround,
+          notes: data.notes,
+        }),
+      });
+
+      // Not signed in → send to sign-in, returning to the dashboard afterward.
+      if (res.status === 401) {
+        window.location.href =
+          "/auth/signin?callbackUrl=" + encodeURIComponent("/dashboard");
+        return;
+      }
+
+      if (res.ok) {
+        const { order } = await res.json();
+        if (order?.displayId) reportId.current = order.displayId;
+      }
     } catch {
-      /* prototype-safe */
+      /* network error — still show confirmation; order can be retried */
     }
+    // Keep the modeling animation visible briefly, then confirm.
     setTimeout(() => setPhase("done"), 2900);
   };
 
