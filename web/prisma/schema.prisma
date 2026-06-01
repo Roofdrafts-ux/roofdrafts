@@ -1,0 +1,183 @@
+// Roofdrafts — Prisma schema
+// Datasource configured via prisma.config.ts / DATABASE_URL env var
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum Role {
+  CUSTOMER
+  ESTIMATOR
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  MODELING
+  QA_REVIEW
+  DELIVERED
+  REVISION_REQUESTED
+  ON_HOLD
+  CANCELLED
+}
+
+enum DeliverableType {
+  PDF
+  XACTIMATE_ESX
+  XML
+}
+
+// ─── Models ───────────────────────────────────────────────────────────────────
+
+model User {
+  id             String          @id @default(cuid())
+  email          String          @unique
+  emailVerified  DateTime?
+  name           String?
+  image          String?
+  role           Role            @default(CUSTOMER)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  // Auth.js relations
+  accounts       AuthAccount[]
+  sessions       Session[]
+
+  // App relations
+  orders         Order[]
+  consentRecords ConsentRecord[]
+
+  @@map("users")
+}
+
+model AuthAccount {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  /// Human-readable ID shown to customers, e.g. RD-48213
+  displayId   String      @unique @default(cuid())
+  userId      String
+  status      OrderStatus @default(PENDING)
+  address     String
+  lat         Float?
+  lng         Float?
+  reportType  String      // "residential" | "commercial" | "3d-esx"
+  turnaround  String      // "standard" | "rush" | "bulk"
+  notes       String?
+  priceUsd    Int?        // cents
+  slaDueAt    DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  deliveredAt DateTime?
+
+  user           User            @relation(fields: [userId], references: [id])
+  roofModel      RoofModel?
+  deliverables   Deliverable[]
+  consentRecords ConsentRecord[]
+
+  @@map("orders")
+}
+
+model RoofModel {
+  id        String   @id @default(cuid())
+  orderId   String   @unique
+  /// Total sloped surface area in square feet (Newell's method)
+  totalSqFt Float
+  /// Roofing squares (totalSqFt / 100)
+  squares   Float
+  /// Per-facet pitch data: [{id, pitch, planAreaSqFt, surfaceAreaSqFt}]
+  pitchData Json
+  ridgeFt   Float
+  hipFt     Float
+  valleyFt  Float
+  rakeFt    Float
+  eaveFt    Float
+  /// Predominant pitch as "X/12" string
+  predominantPitch String
+  /// Raw vertex/edge model JSON for diagram rendering
+  modelData Json?
+  /// MUST be set to false before any deliverable is generated
+  isMock    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("roof_models")
+}
+
+model Deliverable {
+  id        String          @id @default(cuid())
+  orderId   String
+  type      DeliverableType
+  /// Signed storage URL (S3-compatible)
+  url       String?
+  /// Storage object key
+  storageKey String?
+  createdAt DateTime        @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("deliverables")
+}
+
+model ConsentRecord {
+  id        String   @id @default(cuid())
+  userId    String
+  orderId   String?
+  /// e.g. "terms_v1", "stripe_payment_v1", "data_processing_v1"
+  type      String
+  ipAddress String
+  userAgent String
+  createdAt DateTime @default(now())
+
+  user  User   @relation(fields: [userId], references: [id])
+  order Order? @relation(fields: [orderId], references: [id])
+
+  @@map("consent_records")
+}
