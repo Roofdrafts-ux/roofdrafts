@@ -1,0 +1,202 @@
+/* ================================================================
+   Roofdrafts — Auth pages (sign-in / sign-up)
+   Uses verbatim tokens from globals.css / prototype token system.
+   ================================================================ */
+
+.rd-auth-shell {
+  min-height: 100vh;
+  background: var(--nj2-bg-page);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--nj2-s-6);
+  /* subtle grid paper background */
+  background-image:
+    linear-gradient(var(--nj2-ink-100) 1px, transparent 1px),
+    linear-gradient(90deg, var(--nj2-ink-100) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.rd-auth-card {
+  width: 100%;
+  max-width: 400px;
+  background: var(--nj2-bg-card);
+  border: 1.5px solid var(--nj2-border);
+  border-radius: var(--nj2-r-2xl);
+  padding: 40px 36px 36px;
+  box-shadow: var(--nj2-shadow-xl);
+}
+
+/* ── Wordmark ── */
+.rd-auth-brand {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  margin-bottom: 28px;
+  font-family: var(--nj2-font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+.rd-auth-brand-roof    { color: var(--nj2-ink-900); }
+.rd-auth-brand-drafts  { color: var(--nj2-ink-400); }
+
+/* ── Heading ── */
+.rd-auth-heading {
+  font-family: var(--nj2-font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--nj2-fg-1);
+  margin: 0 0 6px;
+}
+
+.rd-auth-sub {
+  font-size: 14px;
+  color: var(--nj2-fg-2);
+  margin: 0 0 24px;
+}
+
+/* ── Google button ── */
+.rd-auth-google-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 42px;
+  border: 1.5px solid var(--nj2-border-strong);
+  border-radius: var(--nj2-r-md);
+  background: var(--nj2-bg-card);
+  font-family: var(--nj2-font-body);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--nj2-fg-1);
+  cursor: pointer;
+  transition: background var(--nj2-dur-fast) var(--nj2-ease-io),
+              border-color var(--nj2-dur-fast) var(--nj2-ease-io),
+              transform var(--nj2-dur-fast) var(--nj2-ease-io);
+}
+.rd-auth-google-btn:hover {
+  background: var(--nj2-bg-sunken);
+  border-color: var(--nj2-fg-4);
+  transform: translateY(-1px);
+}
+
+/* ── Divider ── */
+.rd-auth-divider {
+  position: relative;
+  text-align: center;
+  margin: 20px 0;
+}
+.rd-auth-divider::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--nj2-border);
+}
+.rd-auth-divider span {
+  position: relative;
+  background: var(--nj2-bg-card);
+  padding: 0 10px;
+  font-size: 12px;
+  color: var(--nj2-fg-3);
+  font-family: var(--nj2-font-body);
+}
+
+/* ── Form fields ── */
+.rd-auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rd-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rd-field-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--nj2-fg-1);
+  font-family: var(--nj2-font-body);
+}
+
+.rd-input {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border: 1.5px solid var(--nj2-border);
+  border-radius: var(--nj2-r-md);
+  background: var(--nj2-bg-page);
+  font-family: var(--nj2-font-body);
+  font-size: 14px;
+  color: var(--nj2-fg-1);
+  transition: border-color var(--nj2-dur-fast) var(--nj2-ease-io),
+              box-shadow var(--nj2-dur-fast) var(--nj2-ease-io);
+  box-sizing: border-box;
+}
+.rd-input::placeholder { color: var(--nj2-fg-4); }
+.rd-input:focus {
+  outline: none;
+  border-color: var(--nj2-brand-500);
+  box-shadow: var(--nj2-ring);
+}
+
+/* ── Consent row ── */
+.rd-consent-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+}
+.rd-consent-check {
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  flex-shrink: 0;
+  accent-color: var(--nj2-brand-500);
+  cursor: pointer;
+}
+.rd-consent-text {
+  font-size: 13px;
+  color: var(--nj2-fg-2);
+  line-height: 1.5;
+}
+
+/* ── Submit button ── */
+.rd-auth-submit {
+  width: 100%;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+/* ── Error ── */
+.rd-auth-error {
+  font-size: 13px;
+  color: var(--nj2-danger);
+  background: var(--nj2-danger-soft);
+  border: 1px solid var(--nj2-danger);
+  border-radius: var(--nj2-r-sm);
+  padding: 8px 12px;
+  margin: 0;
+}
+
+/* ── Footer link ── */
+.rd-auth-footer {
+  font-size: 13px;
+  color: var(--nj2-fg-2);
+  text-align: center;
+  margin: 20px 0 0;
+}
+.rd-auth-link {
+  color: var(--nj2-brand-500);
+  font-weight: 600;
+  text-decoration: none;
+}
+.rd-auth-link:hover { text-decoration: underline; }
