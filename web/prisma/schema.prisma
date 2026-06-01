@@ -51,7 +51,8 @@ model User {
   sessions       Session[]
 
   // App relations
-  orders         Order[]
+  orders         Order[]         @relation("CustomerOrders")
+  assignedOrders Order[]         @relation("EstimatorOrders")
   consentRecords ConsentRecord[]
 
   @@map("users")
@@ -115,10 +116,14 @@ model Order {
   updatedAt   DateTime    @updatedAt
   deliveredAt DateTime?
 
-  user           User            @relation(fields: [userId], references: [id])
-  roofModel      RoofModel?
-  deliverables   Deliverable[]
-  consentRecords ConsentRecord[]
+  assignedEstimatorId String?
+  claimedAt           DateTime?
+
+  user             User            @relation("CustomerOrders", fields: [userId], references: [id])
+  assignedEstimator User?          @relation("EstimatorOrders", fields: [assignedEstimatorId], references: [id])
+  roofModel        RoofModel?
+  deliverables     Deliverable[]
+  consentRecords   ConsentRecord[]
 
   @@map("orders")
 }

@@ -91,16 +91,26 @@ function mulberry32(seed: number) {
   };
 }
 
-export function MeasureTool() {
+export function MeasureTool({
+  orderId,
+  orderDisplayId,
+  orderAddress,
+}: {
+  orderId?: string;
+  orderDisplayId?: string;
+  orderAddress?: string;
+} = {}) {
   const [model, setModel] = useState<RoofModel>(() => cloneModel(MODEL_CROSS_GABLE));
   const [frame, setFrame] = useState<Frame>(() => frameOf(MODEL_CROSS_GABLE));
   const [sel, setSel] = useState<Sel>(null);
   const [dragId, setDragId] = useState<string | null>(null);
   const [scene, setScene] = useState<ImageryScene | null>(null);
-  const [address, setAddress] = useState("1490 Junction Ave, San Jose, CA");
+  const [address, setAddress] = useState(orderAddress ?? "1490 Junction Ave, San Jose, CA");
   const [loading, setLoading] = useState(false);
   const [previewMode, setPreviewMode] = useState<"paper" | "blueprint">("blueprint");
   const [showImagery, setShowImagery] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saveMsg, setSaveMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
   const svgRef = useRef<SVGSVGElement | null>(null);
   // generated client-side after mount so the static prerender + hydration agree
@@ -218,6 +228,49 @@ export function MeasureTool() {
     setSel(null);
   };
   const refit = () => setFrame(frameOf(model));
+
+  /* ---------- persist model to the order (estimator) ---------- */
+  const saveModel = useCallback(async () => {
+    if (!orderId) return;
+    setSaving(true);
+    setSaveMsg(null);
+    try {
+      const res = await fetch(`/api/orders/${orderId}/roof-model`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          totalSqFt: m.totalArea,
+          squares: m.squares,
+          predominantPitch: m.predominantPitch,
+          byType: m.byType,
+          facets: m.facets.map((f) => ({
+            id: f.id,
+            pitch: f.pitch,
+            planArea: f.planArea,
+            area: f.area,
+          })),
+          modelData: model,
+          // Mock imagery → model is mock and must never be delivered as real.
+          isMock: scene?.isMock ?? true,
+        }),
+      });
+      if (res.ok) {
+        setSaveMsg({
+          ok: true,
+          text: scene?.isMock
+            ? "Saved — flagged MOCK (cannot be delivered)."
+            : "Saved to order.",
+        });
+      } else {
+        const d = await res.json().catch(() => ({}));
+        setSaveMsg({ ok: false, text: d.error ?? "Save failed." });
+      }
+    } catch {
+      setSaveMsg({ ok: false, text: "Network error while saving." });
+    } finally {
+      setSaving(false);
+    }
+  }, [orderId, m, model, scene]);
 
   const pal = LINE_PALETTE.paper;
 
@@ -407,6 +460,15 @@ export function MeasureTool() {
             setEdgeType={setEdgeType}
           />
           <Measurements m={m} />
+          {orderId && (
+            <SaveBar
+              saving={saving}
+              saveMsg={saveMsg}
+              isMock={scene?.isMock ?? true}
+              displayId={orderDisplayId}
+              onSave={saveModel}
+            />
+          )}
         </div>
       </div>
 
@@ -785,6 +847,68 @@ function Measurements({ m }: { m: ReturnType<typeof computeRoof> }) {
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+function SaveBar({
+  saving,
+  saveMsg,
+  isMock,
+  displayId,
+  onSave,
+}: {
+  saving: boolean;
+  saveMsg: { ok: boolean; text: string } | null;
+  isMock: boolean;
+  displayId?: string;
+  onSave: () => void;
+}) {
+  return (
+    <div className="tp-card" style={{ padding: 16 }}>
+      <PanelTitle>Save to order {displayId ?? ""}</PanelTitle>
+      {isMock && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 7,
+            marginBottom: 10,
+            padding: "8px 11px",
+            borderRadius: 8,
+            background: "var(--tp-accent-soft)",
+            border: "1px solid var(--tp-accent-ring)",
+            color: "var(--tp-accent-600)",
+            fontFamily: "var(--nj2-font-body)",
+            fontSize: 11.5,
+            fontWeight: 600,
+            lineHeight: 1.4,
+          }}
+        >
+          <Icon name="alert-circle" size={14} />
+          Mock imagery — this model saves with isMock=true and is blocked from delivery.
+        </div>
+      )}
+      <button
+        onClick={onSave}
+        disabled={saving}
+        className="nj2-btn tp-btn-accent"
+        style={{ width: "100%", justifyContent: "center", opacity: saving ? 0.7 : 1 }}
+      >
+        {saving ? "Saving…" : "Save roof model"}
+      </button>
+      {saveMsg && (
+        <div
+          style={{
+            marginTop: 10,
+            fontFamily: "var(--nj2-font-mono)",
+            fontSize: 11,
+            color: saveMsg.ok ? "var(--nj2-success)" : "var(--nj2-danger)",
+          }}
+        >
+          {saveMsg.text}
+        </div>
+      )}
     </div>
   );
 }

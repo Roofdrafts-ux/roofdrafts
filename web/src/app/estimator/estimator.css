@@ -1,0 +1,182 @@
+/* ================================================================
+   Roofdrafts — Estimator console
+   Verbatim design tokens from the prototype system.
+   ================================================================ */
+
+.rd-est {
+  min-height: 100vh;
+  background: var(--nj2-bg-page);
+  color: var(--nj2-fg-1);
+  font-family: var(--nj2-font-body);
+}
+
+/* ── Header ── */
+.rd-est-header {
+  border-bottom: 1px solid var(--nj2-border);
+  background: var(--nj2-bg-card);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.rd-est-header-inner {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 14px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.rd-est-brand {
+  display: flex;
+  align-items: baseline;
+  gap: 1px;
+  font-family: var(--nj2-font-display);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  text-decoration: none;
+}
+.rd-est-brand-roof   { color: var(--nj2-ink-900); }
+.rd-est-brand-drafts { color: var(--nj2-ink-400); }
+.rd-est-tag {
+  margin-left: 8px;
+  font-family: var(--nj2-font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--nj2-brand-500);
+  background: var(--nj2-brand-50);
+  padding: 3px 8px;
+  border-radius: var(--nj2-r-pill);
+  align-self: center;
+}
+.rd-est-header-right { display: flex; align-items: center; gap: 14px; }
+.rd-est-user { font-size: 13px; color: var(--nj2-fg-2); font-family: var(--nj2-font-mono); }
+.rd-est-back {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--nj2-fg-2);
+  text-decoration: none;
+}
+.rd-est-back:hover { color: var(--nj2-brand-500); }
+.rd-est-order-head { display: flex; align-items: center; gap: 12px; }
+
+/* ── Main ── */
+.rd-est-main {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 36px 22px 80px;
+}
+.rd-est-h2 {
+  font-family: var(--nj2-font-display);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.rd-est-count {
+  font-family: var(--nj2-font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--nj2-fg-3);
+  background: var(--nj2-bg-muted);
+  padding: 2px 9px;
+  border-radius: var(--nj2-r-pill);
+}
+.rd-est-empty {
+  font-size: 13.5px;
+  color: var(--nj2-fg-3);
+  padding: 18px;
+  border: 1.5px dashed var(--nj2-border-strong);
+  border-radius: var(--nj2-r-lg);
+  background: var(--nj2-bg-card);
+}
+
+/* ── Rows ── */
+.rd-est-list { display: flex; flex-direction: column; gap: 10px; }
+.rd-est-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 15px 18px;
+  background: var(--nj2-bg-card);
+  border: 1.5px solid var(--nj2-border);
+  border-radius: var(--nj2-r-lg);
+  box-shadow: var(--nj2-shadow-sm);
+  text-decoration: none;
+  color: inherit;
+}
+.rd-est-row-link { transition: border-color var(--nj2-dur-fast) var(--nj2-ease-io), box-shadow var(--nj2-dur-fast) var(--nj2-ease-io); }
+.rd-est-row-link:hover { border-color: var(--nj2-brand-500); box-shadow: var(--nj2-shadow-md); }
+.rd-est-row-main { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.rd-est-id {
+  font-family: var(--nj2-font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--nj2-brand-500);
+  letter-spacing: 0.02em;
+}
+.rd-est-address {
+  font-size: 14.5px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rd-est-sub { font-size: 12px; color: var(--nj2-fg-3); font-family: var(--nj2-font-mono); }
+.rd-est-row-side {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+/* ── SLA countdown ── */
+.rd-eta-ok    { font-family: var(--nj2-font-mono); font-size: 11.5px; font-weight: 600; color: var(--nj2-fg-2); white-space: nowrap; }
+.rd-eta-over  { font-family: var(--nj2-font-mono); font-size: 11.5px; font-weight: 700; color: var(--nj2-danger); white-space: nowrap; }
+.rd-eta-muted { font-family: var(--nj2-font-mono); font-size: 11.5px; color: var(--nj2-fg-4); }
+
+/* ── Status badges (shared shape with dashboard) ── */
+.rd-badge {
+  display: inline-flex; align-items: center; height: 24px; padding: 0 11px;
+  border-radius: var(--nj2-r-pill); font-size: 11.5px; font-weight: 600; white-space: nowrap;
+}
+.rd-badge-info    { background: var(--nj2-info-soft);    color: var(--nj2-info); }
+.rd-badge-accent  { background: var(--nj2-brand-50);     color: var(--nj2-brand-600); }
+.rd-badge-warning { background: var(--nj2-warning-soft); color: var(--nj2-warning); }
+.rd-badge-success { background: var(--nj2-success-soft); color: var(--nj2-success); }
+.rd-badge-danger  { background: var(--nj2-danger-soft);  color: var(--nj2-danger); }
+.rd-badge-muted   { background: var(--nj2-bg-muted);     color: var(--nj2-fg-3); }
+
+/* ── Workflow bar (order detail) ── */
+.rd-est-workflow {
+  background: var(--nj2-bg-card);
+  border-bottom: 1px solid var(--nj2-border);
+}
+.rd-est-workflow-inner {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 14px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.rd-est-workflow-addr { font-size: 14px; font-weight: 600; }
+.rd-est-workflow-meta { font-family: var(--nj2-font-mono); font-size: 11.5px; color: var(--nj2-fg-3); margin-top: 2px; }
+.rd-status-controls { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.rd-status-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.rd-status-err { font-family: var(--nj2-font-mono); font-size: 11px; color: var(--nj2-danger); }
+.rd-status-final { font-family: var(--nj2-font-mono); font-size: 11.5px; color: var(--nj2-fg-3); }
+
+@media (max-width: 620px) {
+  .rd-est-row { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .rd-est-row-side { align-items: flex-start; flex-wrap: wrap; }
+}
