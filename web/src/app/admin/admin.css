@@ -92,6 +92,18 @@
   margin: 0 0 14px;
 }
 .rd-admin-empty { font-size: 13.5px; color: var(--nj2-fg-3); }
+.rd-admin-note {
+  font-size: 12px;
+  color: var(--nj2-fg-3);
+  margin-top: 12px;
+}
+.rd-admin-note code {
+  font-family: var(--nj2-font-mono);
+  font-size: 11px;
+  background: var(--nj2-bg-muted);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
 
 /* ── KPI cards ── */
 .rd-kpi-grid {

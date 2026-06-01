@@ -1,23 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionWithRole } from "@/lib/rbac";
 import { prisma } from "@/lib/prisma";
+import { validateTransition } from "@/lib/order-status";
 import type { OrderStatus } from "@/generated/prisma/enums";
 
 const VALID: OrderStatus[] = [
   "PENDING", "MODELING", "QA_REVIEW", "DELIVERED",
   "REVISION_REQUESTED", "ON_HOLD", "CANCELLED",
 ];
-
-/** Allowed forward transitions for an estimator. */
-const ALLOWED: Record<string, OrderStatus[]> = {
-  PENDING: ["MODELING", "ON_HOLD", "CANCELLED"],
-  MODELING: ["QA_REVIEW", "ON_HOLD"],
-  QA_REVIEW: ["DELIVERED", "MODELING", "REVISION_REQUESTED"],
-  REVISION_REQUESTED: ["MODELING"],
-  ON_HOLD: ["MODELING", "CANCELLED"],
-  DELIVERED: ["REVISION_REQUESTED"],
-  CANCELLED: [],
-};
 
 /** PATCH /api/orders/:orderId/status — estimator advances order status. */
 export async function PATCH(
@@ -45,25 +35,12 @@ export async function PATCH(
     return NextResponse.json({ error: "Order not found." }, { status: 404 });
   }
 
-  if (!ALLOWED[order.status]?.includes(next)) {
-    return NextResponse.json(
-      { error: `Cannot move from ${order.status} to ${next}.` },
-      { status: 422 }
-    );
-  }
-
-  // Guardrail: cannot deliver a report whose model was traced over mock imagery.
-  if (next === "DELIVERED" && order.roofModel?.isMock) {
-    return NextResponse.json(
-      { error: "Cannot deliver: roof model is flagged as mock (traced over mock imagery)." },
-      { status: 422 }
-    );
-  }
-  if (next === "QA_REVIEW" && !order.roofModel) {
-    return NextResponse.json(
-      { error: "Cannot send to QA: no roof model saved yet." },
-      { status: 422 }
-    );
+  const check = validateTransition(order.status, next, {
+    hasModel: !!order.roofModel,
+    isMock: order.roofModel?.isMock ?? false,
+  });
+  if (!check.ok) {
+    return NextResponse.json({ error: check.error }, { status: 422 });
   }
 
   const updated = await prisma.order.update({
