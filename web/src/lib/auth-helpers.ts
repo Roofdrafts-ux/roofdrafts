@@ -1,10 +1,11 @@
+import "server-only";
 /**
  * Server-side RBAC helpers.
  * Always enforce roles server-side — never rely on client-side checks alone.
  */
 import { auth } from "./auth";
 import { redirect } from "next/navigation";
-import type { Role } from "../generated/prisma/client";
+import type { Role } from "../generated/prisma/enums";
 
 export async function requireAuth() {
   const session = await auth();
