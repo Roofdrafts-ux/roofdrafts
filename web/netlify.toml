@@ -1,0 +1,14 @@
+# Netlify config for the Roofdrafts Next.js app.
+# Base directory is set to `web` in the Netlify UI, so paths here are relative to web/.
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  # Next.js 16 / React 19 require a modern Node runtime.
+  NODE_VERSION = "20"
+
+# Next Runtime — required for SSR, API routes, and the proxy/middleware to work.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
