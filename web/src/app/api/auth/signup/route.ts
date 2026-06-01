@@ -27,11 +27,19 @@ export async function POST(req: NextRequest) {
     // ── Create user + credentials account ─────────────────────────
     const hash = await bcrypt.hash(password, 12);
 
+    // Bootstrap admins: emails in BOOTSTRAP_ADMIN_EMAILS get ADMIN on signup.
+    // (ADMIN outranks ESTIMATOR, so these accounts can reach every console.)
+    const bootstrapAdmins = (process.env.BOOTSTRAP_ADMIN_EMAILS ?? "")
+      .split(",")
+      .map((e) => e.trim().toLowerCase())
+      .filter(Boolean);
+    const role = bootstrapAdmins.includes(email.toLowerCase()) ? "ADMIN" : "CUSTOMER";
+
     const user = await prisma.user.create({
       data: {
         email,
         name: name ?? null,
-        role: "CUSTOMER",
+        role,
         accounts: {
           create: {
             type: "credentials",
