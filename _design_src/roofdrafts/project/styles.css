@@ -1,0 +1,191 @@
+/* ================================================================
+   TRUEPITCH — utilities on top of the original token system
+   "Drafting Table": paper · ink · clay · blueprint navy
+   ================================================================ */
+
+:root {
+  /* Switchable accent (driven by Tweaks). Default = clay. */
+  --tp-accent:      var(--nj2-brand-500);
+  --tp-accent-600:  var(--nj2-brand-600);
+  --tp-accent-soft: var(--nj2-brand-50);
+  --tp-accent-ring: rgba(190,86,48,.30);
+
+  /* Verified / QA-passed accent */
+  --tp-verify:      var(--nj2-success);
+  --tp-verify-soft: var(--nj2-success-soft);
+  --tp-lime:        var(--nj2-lime-deep);
+
+  --tp-maxw: 1180px;
+
+  /* roof-diagram palette (paper default) */
+  --rd-line:    var(--tp-blue-ink);
+  --rd-ridge:   var(--tp-blue);
+  --rd-key:     var(--nj2-brand-500);
+  --rd-facet:   rgba(42,96,118,0.05);
+  --rd-facet-b: rgba(42,96,118,0.09);
+  --rd-dim:     var(--nj2-fg-3);
+}
+
+/* blueprint panel — light linework on navy */
+.tp-blueprint {
+  background:
+    linear-gradient(0deg, rgba(255,255,255,.025) 1px, transparent 1px) 0 0 / 100% 22px,
+    linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px) 0 0 / 22px 100%,
+    radial-gradient(ellipse 90% 80% at 50% 40%, var(--tp-navy-2), var(--tp-navy) 78%);
+  --rd-line:    var(--tp-blueprint-line);
+  --rd-ridge:   #E9F6FA;
+  --rd-key:     var(--tp-blueprint-key);
+  --rd-facet:   rgba(191,228,239,0.05);
+  --rd-facet-b: rgba(191,228,239,0.09);
+  --rd-dim:     rgba(191,228,239,0.55);
+}
+
+[data-theme="dark"] {
+  --tp-accent-soft: rgba(190,86,48,.16);
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  background: var(--nj2-bg-page);
+  color: var(--nj2-fg-1);
+  font-family: var(--nj2-font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+a { color: inherit; text-decoration: none; }
+*:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--tp-accent-ring); border-radius: 4px; }
+::selection { background: var(--tp-accent-soft); }
+
+/* ───── graph-paper / blueprint grid ───── */
+.tp-graph {
+  background-color: transparent;
+  background-image:
+    linear-gradient(var(--nj2-border-subtle) 1px, transparent 1px),
+    linear-gradient(90deg, var(--nj2-border-subtle) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+.tp-graph-fine {
+  background-image:
+    linear-gradient(var(--nj2-border-subtle) 1px, transparent 1px),
+    linear-gradient(90deg, var(--nj2-border-subtle) 1px, transparent 1px);
+  background-size: 14px 14px;
+}
+.tp-dotgrid {
+  background-image: radial-gradient(circle, var(--nj2-ink-150) .9px, transparent .9px);
+  background-size: 22px 22px;
+}
+[data-theme="dark"] .tp-dotgrid { background-image: radial-gradient(circle, #232327 .9px, transparent .9px); }
+
+/* ───── shared section primitives ───── */
+.tp-eyebrow {
+  font-family: var(--nj2-font-mono); font-weight: 500; font-size: 11px;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--nj2-fg-3);
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.tp-eyebrow .tp-tick { width: 14px; height: 1px; background: var(--tp-accent); display: inline-block; }
+.tp-h2 {
+  font-family: var(--nj2-font-display); font-weight: 600;
+  font-size: clamp(28px, 3.6vw, 46px); letter-spacing: -.032em; line-height: 1.08;
+  margin: 14px 0 0; text-wrap: balance; color: var(--nj2-fg-1);
+}
+.tp-lede {
+  font-size: 17px; line-height: 1.55; color: var(--nj2-fg-2);
+  letter-spacing: -.005em; text-wrap: pretty;
+}
+.tp-ledger {
+  height: 1px; width: 100%; border: 0;
+  background-image: repeating-linear-gradient(to right,
+    var(--nj2-border) 0, var(--nj2-border) 3px, transparent 3px, transparent 7px);
+  background-size: 7px 1px; background-repeat: repeat-x;
+}
+.tp-mono { font-family: var(--nj2-font-mono); font-variant-numeric: tabular-nums; }
+.tp-num  { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
+
+/* ───── card ───── */
+.tp-card {
+  background: var(--nj2-bg-card); border: 1px solid var(--nj2-border);
+  border-radius: var(--nj2-r-2xl); box-shadow: var(--nj2-shadow-sm);
+}
+
+/* ───── chip / pill ───── */
+.tp-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 5px 12px 5px 10px; border-radius: var(--nj2-r-pill);
+  border: 1px solid var(--nj2-border); background: var(--nj2-bg-card);
+  font-size: 12.5px; color: var(--nj2-fg-1); box-shadow: var(--nj2-shadow-xs);
+}
+
+/* ───── dimension annotation (used in diagrams + frames) ───── */
+.tp-dim {
+  font-family: var(--nj2-font-mono); font-size: 10.5px; font-weight: 500;
+  letter-spacing: .01em; fill: var(--tp-blue-ink); color: var(--tp-blue-ink);
+}
+
+/* ───── buttons — extend nj2 set with accent variant ───── */
+.nj2-btn { white-space: nowrap; }
+.tp-btn-accent { background: var(--tp-accent); color: #fff; border-color: var(--tp-accent); }
+.tp-btn-accent:hover { background: var(--tp-accent-600); border-color: var(--tp-accent-600);
+  box-shadow: 0 8px 24px -8px var(--tp-accent-ring); transform: translateY(-1px); }
+
+/* ───── status dot pulse ───── */
+.tp-dot { width: 7px; height: 7px; border-radius: 999px; display: inline-block; position: relative; }
+.tp-dot::after {
+  content: ''; position: absolute; inset: -3px; border-radius: 999px;
+  border: 1px solid currentColor; opacity: .4; animation: tpPulse 2.4s var(--nj2-ease-io) infinite;
+}
+@keyframes tpPulse { 0%{transform:scale(.8);opacity:.5} 70%{transform:scale(1.5);opacity:0} 100%{opacity:0} }
+
+/* ───── reveal-on-scroll ───── */
+.tp-reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s var(--nj2-ease), transform .6s var(--nj2-ease); }
+.tp-reveal.tp-in { opacity: 1; transform: none; }
+
+/* ───── diagram draw-in ───── */
+@keyframes tpDraw { to { stroke-dashoffset: 0; } }
+
+/* ───── marquee for coverage ───── */
+@keyframes tpMarquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .tp-reveal { transition: none; opacity: 1; transform: none; }
+  .tp-dot::after { animation: none; }
+  * { animation-duration: .01ms !important; }
+}
+
+/* ───── nav link ───── */
+.tp-navlink { color: var(--nj2-fg-2); font-size: 14px; font-weight: 500; letter-spacing: -.005em;
+  padding: 6px 10px; border-radius: 7px; cursor: pointer; transition: background .15s, color .15s; }
+.tp-navlink:hover { color: var(--nj2-fg-1); background: var(--nj2-bg-muted); }
+
+/* ───── input ───── */
+.tp-input {
+  width: 100%; height: 44px; padding: 0 14px; border-radius: var(--nj2-r-lg);
+  border: 1px solid var(--nj2-border); background: var(--nj2-bg-card);
+  font-family: var(--nj2-font-body); font-size: 14.5px; color: var(--nj2-fg-1);
+  transition: border-color .15s, box-shadow .15s;
+}
+.tp-input::placeholder { color: var(--nj2-fg-4); }
+.tp-input:focus { outline: none; border-color: var(--tp-accent); box-shadow: 0 0 0 3px var(--tp-accent-ring); }
+textarea.tp-input { height: auto; padding: 12px 14px; resize: vertical; line-height: 1.5; }
+
+/* ───── scrollbar (order modal) ───── */
+.tp-scroll::-webkit-scrollbar { width: 10px; }
+.tp-scroll::-webkit-scrollbar-thumb { background: var(--nj2-border-strong); border-radius: 999px; border: 3px solid var(--nj2-bg-card); }
+
+/* ───── paper grain overlay (atmosphere) ───── */
+.tp-grain::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: .5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.045'/%3E%3C/svg%3E");
+}
+
+/* ───── registration / crosshair drafting marks ───── */
+.tp-reg { position: relative; }
+.tp-reg::before, .tp-reg::after {
+  content: ''; position: absolute; width: 9px; height: 9px; pointer-events: none;
+  border-color: var(--tp-accent); border-style: solid; opacity: .55;
+}
+.tp-reg::before { top: -1px; left: -1px; border-width: 1.5px 0 0 1.5px; }
+.tp-reg::after  { bottom: -1px; right: -1px; border-width: 0 1.5px 1.5px 0; }
+
+/* clay key-line under section eyebrows */
+.tp-keyline { display:inline-block; width:26px; height:2px; background:var(--tp-accent); }

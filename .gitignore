@@ -1,0 +1,16 @@
+# OS
+.DS_Store
+
+# dependencies (web/ has its own .gitignore too)
+node_modules/
+
+# secrets — never commit
+.env
+.env.*
+!.env.example
+
+# local Claude Code settings (machine-specific)
+.claude/settings.local.json
+
+# build artifacts / generated dumps
+_design_index.out

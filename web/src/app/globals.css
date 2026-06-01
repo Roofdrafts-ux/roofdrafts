@@ -1,0 +1,385 @@
+/* ================================================================
+   TRUEPITCH — original design tokens · "Drafting Table"
+   Warm paper · ink · clay (roof-tile) accent · blueprint navy
+   ================================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@1,18..40,400;1,18..40,500&display=swap');
+
+:root {
+  /* ───── Fonts ───── */
+  --nj2-font-display: "Space Grotesk", system-ui, sans-serif;
+  --nj2-font-body:    "Hanken Grotesk", system-ui, sans-serif;
+  --nj2-font-mono:    "JetBrains Mono", ui-monospace, monospace;
+  --nj2-font-serif:   "Newsreader", Georgia, serif;
+
+  /* ───── Warm paper neutral ramp ───── */
+  --nj2-ink-0:   #FFFFFF;
+  --nj2-ink-25:  #FAF6EE;   /* page paper */
+  --nj2-ink-50:  #F4EEE1;
+  --nj2-ink-100: #EBE3D2;
+  --nj2-ink-150: #DFD5BF;
+  --nj2-ink-200: #CDC1A6;
+  --nj2-ink-300: #A99C7E;
+  --nj2-ink-400: #7C7159;
+  --nj2-ink-500: #585041;
+  --nj2-ink-600: #423C30;
+  --nj2-ink-700: #2C2820;
+  --nj2-ink-800: #1D1A14;
+  --nj2-ink-900: #15120D;
+  --nj2-ink-950: #0B0906;
+
+  /* ───── Brand · clay / roof-tile ───── */
+  --nj2-brand-50:  #FBECE4;
+  --nj2-brand-100: #F6D7C7;
+  --nj2-brand-200: #EEB69C;
+  --nj2-brand-300: #E2906B;
+  --nj2-brand-400: #D26F44;
+  --nj2-brand-500: #BE5630;   /* primary clay */
+  --nj2-brand-600: #A2451F;
+  --nj2-brand-700: #7E3619;
+  --nj2-brand-900: #4A2010;
+
+  /* ───── Blueprint navy + line colors ───── */
+  --tp-navy:        #0E2A38;
+  --tp-navy-2:      #123545;
+  --tp-navy-3:      #0A2230;
+  --tp-blueprint-line: #BFE4EF;
+  --tp-blueprint-key:  #F4A26B;
+
+  /* diagram strokes on PAPER */
+  --tp-blue:        #2A6076;
+  --tp-blue-soft:   #E6EEF1;
+  --tp-blue-ink:    #1C4A5C;
+
+  /* ───── Accent · chalk / draft highlight ───── */
+  --nj2-lime:       #E8B23A;     /* draftsman's amber highlight */
+  --nj2-lime-soft:  #FBEEC8;
+  --nj2-lime-deep:  #B7791F;
+
+  /* ───── Module-ish accents (re-used by tiers/cards) ───── */
+  --nj2-mod-seal:       #2C7A7B;  --nj2-mod-seal-soft:  #E2F1F1;  --nj2-mod-seal-ink:  #1A4D4E;
+  --nj2-mod-hire:       #B7791F;  --nj2-mod-hire-soft:  #FBEFCF;  --nj2-mod-hire-ink:  #7A4F11;
+  --nj2-mod-pulse:      #3C7A52;  --nj2-mod-pulse-soft: #E4F1E8;  --nj2-mod-pulse-ink: #245235;
+
+  /* ───── Semantic ───── */
+  --nj2-success: #3C7A52;   --nj2-success-soft: #E4F1E8;
+  --nj2-warning: #B7791F;   --nj2-warning-soft: #FBEFCF;
+  --nj2-danger:  #B23A2E;   --nj2-danger-soft:  #F7E2DE;
+  --nj2-info:    #2A6076;   --nj2-info-soft:    #E6EEF1;
+
+  /* ───── Surfaces · LIGHT (paper) ───── */
+  --nj2-bg-page:     var(--nj2-ink-25);
+  --nj2-bg-card:     #FFFDF8;
+  --nj2-bg-sunken:   var(--nj2-ink-50);
+  --nj2-bg-muted:    var(--nj2-ink-100);
+  --nj2-fg-1:        var(--nj2-ink-900);
+  --nj2-fg-2:        var(--nj2-ink-500);
+  --nj2-fg-3:        var(--nj2-ink-400);
+  --nj2-fg-4:        var(--nj2-ink-300);
+  --nj2-border:      var(--nj2-ink-150);
+  --nj2-border-subtle: var(--nj2-ink-100);
+  --nj2-border-strong: var(--nj2-ink-200);
+
+  /* ───── Radii — crisp / technical ───── */
+  --nj2-r-xs: 2px;  --nj2-r-sm: 4px;  --nj2-r-md: 6px;  --nj2-r-lg: 8px;
+  --nj2-r-xl: 10px; --nj2-r-2xl: 13px; --nj2-r-3xl: 18px; --nj2-r-pill: 9999px;
+
+  /* ───── Spacing ───── */
+  --nj2-s-1:4px; --nj2-s-2:8px; --nj2-s-3:12px; --nj2-s-4:16px; --nj2-s-5:20px;
+  --nj2-s-6:24px; --nj2-s-8:32px; --nj2-s-10:40px; --nj2-s-12:48px; --nj2-s-16:64px; --nj2-s-24:96px;
+
+  /* ───── Elevation — flat printed-paper ───── */
+  --nj2-shadow-xs: 0 1px 0 rgba(21,18,13,.05);
+  --nj2-shadow-sm: 0 1px 2px rgba(21,18,13,.06), 0 1px 0 rgba(21,18,13,.03);
+  --nj2-shadow-md: 0 2px 8px -2px rgba(21,18,13,.10), 0 1px 2px rgba(21,18,13,.05);
+  --nj2-shadow-lg: 0 10px 24px -8px rgba(21,18,13,.16), 0 2px 6px rgba(21,18,13,.06);
+  --nj2-shadow-xl: 0 22px 48px -14px rgba(21,18,13,.24), 0 6px 14px rgba(21,18,13,.08);
+  --nj2-shadow-cta: 0 8px 20px -8px rgba(190,86,48,.42);
+  --nj2-shadow-inset: inset 0 1px 0 rgba(255,255,255,.4);
+
+  --nj2-ring: 0 0 0 3px rgba(190,86,48,.30);
+
+  --nj2-ease:     cubic-bezier(.2,1,.3,1);
+  --nj2-ease-io:  cubic-bezier(.4,0,.2,1);
+  --nj2-dur-fast: 150ms; --nj2-dur-med: 240ms; --nj2-dur-slow: 420ms;
+}
+
+/* ───── BLUEPRINT theme (the "dark" toggle becomes a blueprint) ───── */
+[data-theme="dark"] {
+  --nj2-bg-page:     var(--tp-navy);
+  --nj2-bg-card:     #103140;
+  --nj2-bg-sunken:   var(--tp-navy-3);
+  --nj2-bg-muted:    #16404F;
+  --nj2-fg-1:        #ECF6F5;
+  --nj2-fg-2:        #9CBDC6;
+  --nj2-fg-3:        #6E94A0;
+  --nj2-fg-4:        #4E727E;
+  --nj2-border:      #20505F;
+  --nj2-border-subtle: #173E4B;
+  --nj2-border-strong: #2C657777;
+
+  --nj2-bg-card: #103140;
+  --tp-blue:      #79C4DA;
+  --tp-blue-soft: rgba(121,196,218,.14);
+  --tp-blue-ink:  #BFE4EF;
+
+  --nj2-shadow-sm: 0 0 0 1px rgba(255,255,255,.02);
+  --nj2-shadow-md: 0 8px 24px rgba(0,0,0,.4);
+  --nj2-shadow-lg: 0 16px 40px rgba(0,0,0,.5);
+  --nj2-shadow-xl: 0 28px 56px rgba(0,0,0,.6);
+}
+
+/* ================================================================
+   TYPE
+   ================================================================ */
+body {
+  font-family: var(--nj2-font-body);
+  color: var(--nj2-fg-1);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ───── ledger / drafting hairline ───── */
+.nj2-ledger, .tp-ledger {
+  height: 1px; width: 100%; border: 0;
+  background-image: repeating-linear-gradient(to right,
+    var(--nj2-border) 0, var(--nj2-border) 3px, transparent 3px, transparent 7px);
+  background-size: 7px 1px; background-repeat: repeat-x;
+}
+
+/* ================================================================
+   BUTTONS
+   ================================================================ */
+.nj2-btn {
+  display:inline-flex; align-items:center; gap:8px; height:40px; padding:0 18px;
+  border-radius:var(--nj2-r-md); font-family:var(--nj2-font-body); font-size:14px; font-weight:600;
+  line-height:1; border:1.5px solid transparent; cursor:pointer; white-space:nowrap;
+  transition: background var(--nj2-dur-fast) var(--nj2-ease-io), color var(--nj2-dur-fast) var(--nj2-ease-io), border-color var(--nj2-dur-fast) var(--nj2-ease-io), box-shadow var(--nj2-dur-fast) var(--nj2-ease-io), transform var(--nj2-dur-fast) var(--nj2-ease-io);
+  letter-spacing:-.01em;
+}
+.nj2-btn:focus-visible { outline:none; box-shadow:var(--nj2-ring); }
+.nj2-btn-primary { background:var(--nj2-ink-900); color:#FAF6EE; border-color:var(--nj2-ink-900); }
+.nj2-btn-primary:hover { background:var(--nj2-ink-800); border-color:var(--nj2-ink-800); transform:translateY(-1px); box-shadow:var(--nj2-shadow-md); }
+.nj2-btn-brand { background:var(--nj2-brand-500); color:#fff; border-color:var(--nj2-brand-500); }
+.nj2-btn-brand:hover { background:var(--nj2-brand-600); border-color:var(--nj2-brand-600); box-shadow:var(--nj2-shadow-cta); transform:translateY(-1px); }
+.nj2-btn-secondary { background:var(--nj2-bg-card); color:var(--nj2-fg-1); border-color:var(--nj2-border-strong); }
+.nj2-btn-secondary:hover { background:var(--nj2-bg-sunken); border-color:var(--nj2-fg-4); transform:translateY(-1px); }
+.nj2-btn-ghost { background:transparent; color:var(--nj2-fg-1); border-color:transparent; }
+.nj2-btn-ghost:hover { background:var(--nj2-bg-muted); }
+.nj2-btn-sm { height:32px; padding:0 13px; font-size:12.5px; border-radius:var(--nj2-r-sm); }
+.nj2-btn-lg { height:46px; padding:0 22px; font-size:15px; border-radius:var(--nj2-r-md); }
+
+/* ================================================================
+   TRUEPITCH — utilities on top of the original token system
+   "Drafting Table": paper · ink · clay · blueprint navy
+   ================================================================ */
+
+:root {
+  /* Switchable accent (driven by Tweaks). Default = clay. */
+  --tp-accent:      var(--nj2-brand-500);
+  --tp-accent-600:  var(--nj2-brand-600);
+  --tp-accent-soft: var(--nj2-brand-50);
+  --tp-accent-ring: rgba(190,86,48,.30);
+
+  /* Verified / QA-passed accent */
+  --tp-verify:      var(--nj2-success);
+  --tp-verify-soft: var(--nj2-success-soft);
+  --tp-lime:        var(--nj2-lime-deep);
+
+  --tp-maxw: 1180px;
+
+  /* roof-diagram palette (paper default) */
+  --rd-line:    var(--tp-blue-ink);
+  --rd-ridge:   var(--tp-blue);
+  --rd-key:     var(--nj2-brand-500);
+  --rd-facet:   rgba(42,96,118,0.05);
+  --rd-facet-b: rgba(42,96,118,0.09);
+  --rd-dim:     var(--nj2-fg-3);
+}
+
+/* blueprint panel — light linework on navy */
+.tp-blueprint {
+  background:
+    linear-gradient(0deg, rgba(255,255,255,.025) 1px, transparent 1px) 0 0 / 100% 22px,
+    linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px) 0 0 / 22px 100%,
+    radial-gradient(ellipse 90% 80% at 50% 40%, var(--tp-navy-2), var(--tp-navy) 78%);
+  --rd-line:    var(--tp-blueprint-line);
+  --rd-ridge:   #E9F6FA;
+  --rd-key:     var(--tp-blueprint-key);
+  --rd-facet:   rgba(191,228,239,0.05);
+  --rd-facet-b: rgba(191,228,239,0.09);
+  --rd-dim:     rgba(191,228,239,0.55);
+}
+
+[data-theme="dark"] {
+  --tp-accent-soft: rgba(190,86,48,.16);
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  background: var(--nj2-bg-page);
+  color: var(--nj2-fg-1);
+  font-family: var(--nj2-font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+a { color: inherit; text-decoration: none; }
+*:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--tp-accent-ring); border-radius: 4px; }
+::selection { background: var(--tp-accent-soft); }
+
+/* ───── graph-paper / blueprint grid ───── */
+.tp-graph {
+  background-color: transparent;
+  background-image:
+    linear-gradient(var(--nj2-border-subtle) 1px, transparent 1px),
+    linear-gradient(90deg, var(--nj2-border-subtle) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+.tp-graph-fine {
+  background-image:
+    linear-gradient(var(--nj2-border-subtle) 1px, transparent 1px),
+    linear-gradient(90deg, var(--nj2-border-subtle) 1px, transparent 1px);
+  background-size: 14px 14px;
+}
+.tp-dotgrid {
+  background-image: radial-gradient(circle, var(--nj2-ink-150) .9px, transparent .9px);
+  background-size: 22px 22px;
+}
+[data-theme="dark"] .tp-dotgrid { background-image: radial-gradient(circle, #232327 .9px, transparent .9px); }
+
+/* ───── shared section primitives ───── */
+.tp-eyebrow {
+  font-family: var(--nj2-font-mono); font-weight: 500; font-size: 11px;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--nj2-fg-3);
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.tp-eyebrow .tp-tick { width: 14px; height: 1px; background: var(--tp-accent); display: inline-block; }
+.tp-h2 {
+  font-family: var(--nj2-font-display); font-weight: 600;
+  font-size: clamp(28px, 3.6vw, 46px); letter-spacing: -.032em; line-height: 1.08;
+  margin: 14px 0 0; text-wrap: balance; color: var(--nj2-fg-1);
+}
+.tp-lede {
+  font-size: 17px; line-height: 1.55; color: var(--nj2-fg-2);
+  letter-spacing: -.005em; text-wrap: pretty;
+}
+.tp-ledger {
+  height: 1px; width: 100%; border: 0;
+  background-image: repeating-linear-gradient(to right,
+    var(--nj2-border) 0, var(--nj2-border) 3px, transparent 3px, transparent 7px);
+  background-size: 7px 1px; background-repeat: repeat-x;
+}
+.tp-mono { font-family: var(--nj2-font-mono); font-variant-numeric: tabular-nums; }
+.tp-num  { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
+
+/* ───── card ───── */
+.tp-card {
+  background: var(--nj2-bg-card); border: 1px solid var(--nj2-border);
+  border-radius: var(--nj2-r-2xl); box-shadow: var(--nj2-shadow-sm);
+}
+
+/* ───── chip / pill ───── */
+.tp-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 5px 12px 5px 10px; border-radius: var(--nj2-r-pill);
+  border: 1px solid var(--nj2-border); background: var(--nj2-bg-card);
+  font-size: 12.5px; color: var(--nj2-fg-1); box-shadow: var(--nj2-shadow-xs);
+}
+
+/* ───── dimension annotation (used in diagrams + frames) ───── */
+.tp-dim {
+  font-family: var(--nj2-font-mono); font-size: 10.5px; font-weight: 500;
+  letter-spacing: .01em; fill: var(--tp-blue-ink); color: var(--tp-blue-ink);
+}
+
+/* ───── buttons — extend nj2 set with accent variant ───── */
+.nj2-btn { white-space: nowrap; }
+.tp-btn-accent { background: var(--tp-accent); color: #fff; border-color: var(--tp-accent); }
+.tp-btn-accent:hover { background: var(--tp-accent-600); border-color: var(--tp-accent-600);
+  box-shadow: 0 8px 24px -8px var(--tp-accent-ring); transform: translateY(-1px); }
+
+/* ───── status dot pulse ───── */
+.tp-dot { width: 7px; height: 7px; border-radius: 999px; display: inline-block; position: relative; }
+.tp-dot::after {
+  content: ''; position: absolute; inset: -3px; border-radius: 999px;
+  border: 1px solid currentColor; opacity: .4; animation: tpPulse 2.4s var(--nj2-ease-io) infinite;
+}
+@keyframes tpPulse { 0%{transform:scale(.8);opacity:.5} 70%{transform:scale(1.5);opacity:0} 100%{opacity:0} }
+
+/* ───── reveal-on-scroll ───── */
+.tp-reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s var(--nj2-ease), transform .6s var(--nj2-ease); }
+.tp-reveal.tp-in { opacity: 1; transform: none; }
+
+/* ───── diagram draw-in ───── */
+@keyframes tpDraw { to { stroke-dashoffset: 0; } }
+
+/* ───── marquee for coverage ───── */
+@keyframes tpMarquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .tp-reveal { transition: none; opacity: 1; transform: none; }
+  .tp-dot::after { animation: none; }
+  * { animation-duration: .01ms !important; }
+}
+
+/* ───── nav link ───── */
+.tp-navlink { color: var(--nj2-fg-2); font-size: 14px; font-weight: 500; letter-spacing: -.005em;
+  padding: 6px 10px; border-radius: 7px; cursor: pointer; transition: background .15s, color .15s; }
+.tp-navlink:hover { color: var(--nj2-fg-1); background: var(--nj2-bg-muted); }
+
+/* ───── input ───── */
+.tp-input {
+  width: 100%; height: 44px; padding: 0 14px; border-radius: var(--nj2-r-lg);
+  border: 1px solid var(--nj2-border); background: var(--nj2-bg-card);
+  font-family: var(--nj2-font-body); font-size: 14.5px; color: var(--nj2-fg-1);
+  transition: border-color .15s, box-shadow .15s;
+}
+.tp-input::placeholder { color: var(--nj2-fg-4); }
+.tp-input:focus { outline: none; border-color: var(--tp-accent); box-shadow: 0 0 0 3px var(--tp-accent-ring); }
+textarea.tp-input { height: auto; padding: 12px 14px; resize: vertical; line-height: 1.5; }
+
+/* ───── scrollbar (order modal) ───── */
+.tp-scroll::-webkit-scrollbar { width: 10px; }
+.tp-scroll::-webkit-scrollbar-thumb { background: var(--nj2-border-strong); border-radius: 999px; border: 3px solid var(--nj2-bg-card); }
+
+/* ───── paper grain overlay (atmosphere) ───── */
+.tp-grain::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: .5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.045'/%3E%3C/svg%3E");
+}
+
+/* ───── registration / crosshair drafting marks ───── */
+.tp-reg { position: relative; }
+.tp-reg::before, .tp-reg::after {
+  content: ''; position: absolute; width: 9px; height: 9px; pointer-events: none;
+  border-color: var(--tp-accent); border-style: solid; opacity: .55;
+}
+.tp-reg::before { top: -1px; left: -1px; border-width: 1.5px 0 0 1.5px; }
+.tp-reg::after  { bottom: -1px; right: -1px; border-width: 0 1.5px 1.5px 0; }
+
+/* clay key-line under section eyebrows */
+.tp-keyline { display:inline-block; width:26px; height:2px; background:var(--tp-accent); }
+
+/* ================================================================
+   ORDER MODAL — motion (ported from orderflow inline keyframes)
+   ================================================================ */
+@keyframes tpFade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes tpPop { from { opacity: 0; transform: translateY(12px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes tpSpin { to { transform: rotate(360deg); } }
+.tp-spin { animation: tpSpin .8s linear infinite; }
+
+/* ================================================================
+   RESPONSIVE — collapses for the marketing grids (from index.html)
+   ================================================================ */
+@media (max-width: 960px) {
+  .tp-nav-desktop { display: none !important; }
+  .tp-how-grid, .tp-fmt-grid, .tp-quote-grid, .tp-price-grid { grid-template-columns: 1fr 1fr !important; }
+  .tp-sla-wrap, .tp-cov-wrap, .tp-faq-wrap, .tp-cta-top, .tp-foot-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+  .tp-report-grid { grid-template-columns: 1fr !important; }
+  .tp-modeling { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 620px) {
+  .tp-how-grid, .tp-fmt-grid, .tp-quote-grid, .tp-price-grid, .tp-stat-grid { grid-template-columns: 1fr !important; }
+  .tp-foot-grid { grid-template-columns: 1fr 1fr !important; }
+}

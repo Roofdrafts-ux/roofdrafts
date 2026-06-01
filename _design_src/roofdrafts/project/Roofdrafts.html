@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Roofdrafts — Accurate roof diagrams, delivered fast</title>
+  <meta name="description" content="Roofdrafts turns aerial imagery into precise, estimate-ready roof reports — area, squares, pitch, ridges, hips and valleys. Human-verified, 6–10 hr turnaround, Xactimate ESX.">
+  <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <style>
+    /* responsive collapses for the marketing grids */
+    @media (max-width: 960px) {
+      .tp-nav-desktop { display: none !important; }
+      .tp-how-grid, .tp-fmt-grid, .tp-quote-grid, .tp-price-grid { grid-template-columns: 1fr 1fr !important; }
+      .tp-sla-wrap, .tp-cov-wrap, .tp-faq-wrap, .tp-cta-top, .tp-foot-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+      .tp-report-grid { grid-template-columns: 1fr !important; }
+      .tp-modeling { grid-template-columns: 1fr !important; }
+    }
+    @media (max-width: 620px) {
+      .tp-how-grid, .tp-fmt-grid, .tp-quote-grid, .tp-price-grid, .tp-stat-grid { grid-template-columns: 1fr !important; }
+      .tp-foot-grid { grid-template-columns: 1fr 1fr !important; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- Netlify Forms detection: hidden static form so Netlify registers it at deploy.
+       The React order flow POSTs to this form name. Submissions appear in your
+       Netlify dashboard → Forms, and can email you on each new entry. -->
+  <form name="roof-report-order" data-netlify="true" netlify-honeypot="bot-field" hidden>
+    <input type="hidden" name="form-name" value="roof-report-order" />
+    <input name="bot-field" />
+    <input name="reportId" />
+    <input name="address" />
+    <input name="city" />
+    <input name="unit" />
+    <input name="reportType" />
+    <input name="turnaround" />
+    <input name="name" />
+    <input name="company" />
+    <input name="email" />
+    <input name="phone" />
+    <textarea name="notes"></textarea>
+  </form>
+  <template id="__bundler_thumbnail">
+    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <rect width="100" height="100" fill="#0E2A38"/>
+      <g transform="translate(50 50)" fill="none" stroke="#BFE4EF" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M-20 6 L0 -16 L20 6 Z"/>
+        <path d="M-20 12 H20"/>
+      </g>
+      <circle cx="50" cy="34" r="3.2" fill="#BE5630"/>
+    </svg>
+  </template>
+  <script type="text/babel" src="tweaks-panel.jsx"></script>
+  <script type="text/babel" src="components.jsx"></script>
+  <script type="text/babel" src="roofcalc.jsx"></script>
+  <script type="text/babel" src="sections.jsx"></script>
+  <script type="text/babel" src="sections2.jsx"></script>
+  <script type="text/babel" src="orderflow.jsx"></script>
+  <script type="text/babel" src="app.jsx"></script>
+</body>
+</html>
