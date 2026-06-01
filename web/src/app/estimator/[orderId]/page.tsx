@@ -4,6 +4,7 @@ import { STATUS_META } from "@/lib/orders";
 import { MeasureTool } from "@/components/measure/MeasureTool";
 import { StatusControls } from "@/components/estimator/StatusControls";
 import { Countdown } from "@/components/estimator/Countdown";
+import { DeliverablesPanel } from "@/components/estimator/DeliverablesPanel";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import "../estimator.css";
@@ -21,7 +22,7 @@ export default async function EstimatorOrderPage({
 
   const order = await prisma.order.findUnique({
     where: { id: orderId },
-    include: { roofModel: true },
+    include: { roofModel: true, deliverables: true },
   });
   if (!order) notFound();
 
@@ -52,6 +53,14 @@ export default async function EstimatorOrderPage({
             </div>
           </div>
           <StatusControls orderId={order.id} status={order.status as OrderStatus} />
+        </div>
+        <div className="rd-est-workflow-inner" style={{ paddingTop: 0 }}>
+          <DeliverablesPanel
+            orderId={order.id}
+            hasModel={!!order.roofModel}
+            isMock={order.roofModel?.isMock ?? true}
+            deliverables={order.deliverables.map((d) => ({ id: d.id, type: d.type, url: d.url }))}
+          />
         </div>
       </div>
 
