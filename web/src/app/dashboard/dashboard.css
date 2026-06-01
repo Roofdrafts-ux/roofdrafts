@@ -147,6 +147,7 @@
   align-items: center;
 }
 .rd-order-dot { color: var(--nj2-fg-4); }
+.rd-order-badges { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
 
 .rd-order-side {
   display: flex;

@@ -1,6 +1,7 @@
 import { requireAuth } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 import { STATUS_META } from "@/lib/orders";
+import { formatUsd } from "@/lib/pricing";
 import { SignOutButton } from "@/components/dashboard/SignOutButton";
 import Link from "next/link";
 import "./dashboard.css";
@@ -92,11 +93,25 @@ export default async function DashboardPage() {
                       <span>{TURN_LABEL[o.turnaround] ?? o.turnaround}</span>
                       <span className="rd-order-dot">·</span>
                       <span>Ordered {fmtDate(o.createdAt)}</span>
+                      <span className="rd-order-dot">·</span>
+                      <span>{o.priceUsd != null ? formatUsd(o.priceUsd) : "—"}</span>
                     </div>
                   </div>
 
                   <div className="rd-order-side">
-                    <span className={`rd-badge rd-badge-${meta.tone}`}>{meta.label}</span>
+                    <div className="rd-order-badges">
+                      <span className={`rd-badge rd-badge-${meta.tone}`}>{meta.label}</span>
+                      <span
+                        className={`rd-badge rd-badge-${o.paymentStatus === "PAID" ? "success" : o.paymentStatus === "REFUNDED" ? "muted" : "warning"}`}
+                      >
+                        {o.paymentStatus === "PAID" ? "Paid" : o.paymentStatus === "REFUNDED" ? "Refunded" : "Unpaid"}
+                      </span>
+                    </div>
+                    {o.paymentStatus === "UNPAID" && o.status !== "CANCELLED" && (
+                      <Link href={`/dashboard/pay/${o.id}`} className="nj2-btn nj2-btn-brand nj2-btn-sm">
+                        Pay {o.priceUsd != null ? formatUsd(o.priceUsd) : ""}
+                      </Link>
+                    )}
                     {o.status === "DELIVERED" && o.deliverables.length > 0 ? (
                       <div className="rd-order-files">
                         {o.deliverables.map((d) => (

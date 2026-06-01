@@ -34,6 +34,12 @@ enum DeliverableType {
   XML
 }
 
+enum PaymentStatus {
+  UNPAID
+  PAID
+  REFUNDED
+}
+
 // ─── Models ───────────────────────────────────────────────────────────────────
 
 model User {
@@ -115,6 +121,10 @@ model Order {
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   deliveredAt DateTime?
+
+  paymentStatus         PaymentStatus @default(UNPAID)
+  stripePaymentIntentId String?
+  paidAt                DateTime?
 
   assignedEstimatorId String?
   claimedAt           DateTime?

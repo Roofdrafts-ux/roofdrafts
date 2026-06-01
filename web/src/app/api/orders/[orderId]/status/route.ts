@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSessionWithRole } from "@/lib/rbac";
 import { prisma } from "@/lib/prisma";
 import { validateTransition } from "@/lib/order-status";
+import { notifyForOrder } from "@/lib/notify";
 import type { OrderStatus } from "@/generated/prisma/enums";
 
 const VALID: OrderStatus[] = [
@@ -50,6 +51,15 @@ export async function PATCH(
       deliveredAt: next === "DELIVERED" ? new Date() : order.deliveredAt,
     },
   });
+
+  // Lifecycle emails (best-effort).
+  const EVENT: Partial<Record<typeof next, "in_production" | "delivered" | "revision_requested">> = {
+    MODELING: "in_production",
+    DELIVERED: "delivered",
+    REVISION_REQUESTED: "revision_requested",
+  };
+  const event = EVENT[next];
+  if (event) await notifyForOrder(orderId, event);
 
   return NextResponse.json({ order: updated });
 }

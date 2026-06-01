@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { normalizeReportType, normalizeTurnaround, computeSlaDueAt } from "@/lib/orders";
+import { getPrice } from "@/lib/pricing";
+import { notifyForOrder } from "@/lib/notify";
 
 /** GET /api/orders — list the signed-in user's orders (newest first). */
 export async function GET() {
@@ -61,8 +63,12 @@ export async function POST(req: NextRequest) {
       turnaround: turn,
       notes: notes?.trim() || null,
       slaDueAt: computeSlaDueAt(turn, now),
+      priceUsd: getPrice(reportType, turn),
     },
   });
+
+  // Best-effort "order received" email (never blocks the response).
+  await notifyForOrder(order.id, "received");
 
   return NextResponse.json({ order }, { status: 201 });
 }

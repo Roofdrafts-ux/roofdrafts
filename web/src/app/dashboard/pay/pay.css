@@ -1,0 +1,70 @@
+/* Roofdrafts — checkout page · design tokens */
+
+.rd-pay-back {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--nj2-fg-2);
+  text-decoration: none;
+}
+.rd-pay-back:hover { color: var(--nj2-brand-500); }
+
+.rd-pay-main {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+.rd-pay-card {
+  background: var(--nj2-bg-card);
+  border: 1.5px solid var(--nj2-border);
+  border-radius: var(--nj2-r-2xl);
+  padding: 32px 28px;
+  box-shadow: var(--nj2-shadow-lg);
+}
+.rd-pay-h1 {
+  font-family: var(--nj2-font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin: 0 0 18px;
+}
+.rd-pay-summary {
+  border: 1px solid var(--nj2-border-subtle);
+  border-radius: var(--nj2-r-lg);
+  padding: 14px 16px;
+  margin-bottom: 22px;
+  background: var(--nj2-bg-sunken);
+}
+.rd-pay-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  color: var(--nj2-fg-2);
+  padding: 4px 0;
+}
+.rd-pay-total {
+  border-top: 1px solid var(--nj2-border-subtle);
+  margin-top: 8px;
+  padding-top: 10px;
+  font-weight: 600;
+  color: var(--nj2-fg-1);
+}
+.rd-pay-amount {
+  font-family: var(--nj2-font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--nj2-brand-500);
+}
+.rd-pay-form { display: flex; flex-direction: column; gap: 18px; }
+.rd-pay-submit { width: 100%; justify-content: center; }
+.rd-pay-note { font-size: 11px; color: var(--nj2-fg-3); text-align: center; margin: 0; }
+.rd-pay-err {
+  font-size: 13px;
+  color: var(--nj2-danger);
+  background: var(--nj2-danger-soft);
+  border: 1px solid var(--nj2-danger);
+  border-radius: var(--nj2-r-sm);
+  padding: 10px 12px;
+  margin: 0;
+}
+.rd-pay-loading { font-size: 13px; color: var(--nj2-fg-3); text-align: center; }
