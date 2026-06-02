@@ -39,6 +39,7 @@ export async function PATCH(
   const check = validateTransition(order.status, next, {
     hasModel: !!order.roofModel,
     isMock: order.roofModel?.isMock ?? false,
+    aiDrafted: order.roofModel?.aiDrafted ?? false,
   });
   if (!check.ok) {
     return NextResponse.json({ error: check.error }, { status: 422 });

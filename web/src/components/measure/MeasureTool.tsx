@@ -95,13 +95,17 @@ export function MeasureTool({
   orderId,
   orderDisplayId,
   orderAddress,
+  initialModel,
 }: {
   orderId?: string;
   orderDisplayId?: string;
   orderAddress?: string;
+  /** Seed the canvas with an existing/AI-drafted model instead of the blank template. */
+  initialModel?: RoofModel;
 } = {}) {
-  const [model, setModel] = useState<RoofModel>(() => cloneModel(MODEL_CROSS_GABLE));
-  const [frame, setFrame] = useState<Frame>(() => frameOf(MODEL_CROSS_GABLE));
+  const seedModel = initialModel ?? MODEL_CROSS_GABLE;
+  const [model, setModel] = useState<RoofModel>(() => cloneModel(seedModel));
+  const [frame, setFrame] = useState<Frame>(() => frameOf(seedModel));
   const [sel, setSel] = useState<Sel>(null);
   const [dragId, setDragId] = useState<string | null>(null);
   const [scene, setScene] = useState<ImageryScene | null>(null);

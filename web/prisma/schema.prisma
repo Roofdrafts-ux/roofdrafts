@@ -158,6 +158,18 @@ model RoofModel {
   modelData Json?
   /// MUST be set to false before any deliverable is generated
   isMock    Boolean  @default(true)
+
+  /// AI-assisted measurement: true = auto-drafted, not yet human-verified.
+  /// Cannot reach QA/DELIVERED while true.
+  aiDrafted    Boolean   @default(false)
+  /// AI confidence 0..1 (null for manually-traced models).
+  confidence   Float?
+  /// Extraction source, e.g. "mock", "google-solar".
+  source       String?
+  /// Estimator who verified the model (set when saved via the measure tool).
+  verifiedById String?
+  verifiedAt   DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

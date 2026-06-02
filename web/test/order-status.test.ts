@@ -1,9 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { validateTransition, ALLOWED_TRANSITIONS } from "@/lib/order-status";
 
-const ctx = (over: Partial<{ hasModel: boolean; isMock: boolean }> = {}) => ({
+const ctx = (over: Partial<{ hasModel: boolean; isMock: boolean; aiDrafted: boolean }> = {}) => ({
   hasModel: true,
   isMock: false,
+  aiDrafted: false,
   ...over,
 });
 
@@ -36,5 +37,20 @@ describe("order status state machine", () => {
 
   it("allows delivery of a real (non-mock) model", () => {
     expect(validateTransition("QA_REVIEW", "DELIVERED", ctx({ isMock: false })).ok).toBe(true);
+  });
+
+  // AI-assisted measurement: unverified drafts cannot advance.
+  it("BLOCKS QA_REVIEW for an unverified AI draft", () => {
+    const r = validateTransition("MODELING", "QA_REVIEW", ctx({ aiDrafted: true }));
+    expect(r.ok).toBe(false);
+    expect(r.error).toMatch(/AI draft/i);
+  });
+
+  it("BLOCKS delivery of an unverified AI draft", () => {
+    expect(validateTransition("QA_REVIEW", "DELIVERED", ctx({ aiDrafted: true })).ok).toBe(false);
+  });
+
+  it("allows QA once the AI draft is human-verified (aiDrafted=false)", () => {
+    expect(validateTransition("MODELING", "QA_REVIEW", ctx({ aiDrafted: false })).ok).toBe(true);
   });
 });

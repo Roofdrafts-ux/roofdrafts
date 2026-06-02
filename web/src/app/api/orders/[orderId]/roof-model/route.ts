@@ -67,6 +67,11 @@ export async function PUT(
     modelData: (modelData ?? null) as object,
     // Default to mock-safe: only false when the client explicitly says imagery is real.
     isMock: isMock !== false,
+    // A manual save through the measure tool IS the human verification step:
+    // clear the AI-draft flag and stamp the verifying estimator.
+    aiDrafted: false,
+    verifiedById: session.user.id,
+    verifiedAt: new Date(),
   };
 
   const roofModel = await prisma.roofModel.upsert({

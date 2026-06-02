@@ -5,10 +5,12 @@ import { MeasureTool } from "@/components/measure/MeasureTool";
 import { StatusControls } from "@/components/estimator/StatusControls";
 import { Countdown } from "@/components/estimator/Countdown";
 import { DeliverablesPanel } from "@/components/estimator/DeliverablesPanel";
+import { AiDraftButton } from "@/components/estimator/AiDraftButton";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import "../estimator.css";
 import type { OrderStatus } from "@/generated/prisma/enums";
+import type { RoofModel } from "@/lib/roofcalc";
 
 export const metadata = { title: "Measure — Roofdrafts" };
 
@@ -27,6 +29,8 @@ export default async function EstimatorOrderPage({
   if (!order) notFound();
 
   const meta = STATUS_META[order.status as OrderStatus];
+  const rm = order.roofModel;
+  const initialModel = (rm?.modelData as RoofModel | null) ?? undefined;
 
   return (
     <div className="rd-est">
@@ -47,13 +51,26 @@ export default async function EstimatorOrderPage({
           <div className="rd-est-workflow-info">
             <div className="rd-est-workflow-addr">{order.address}</div>
             <div className="rd-est-workflow-meta">
-              {order.roofModel
-                ? `Model saved · ${order.roofModel.squares.toFixed(1)} SQ · ${order.roofModel.predominantPitch}${order.roofModel.isMock ? " · MOCK" : ""}`
-                : "No model saved yet — trace the roof, then Save."}
+              {rm
+                ? `Model ${rm.aiDrafted ? "AI-drafted" : "saved"} · ${rm.squares.toFixed(1)} SQ · ${rm.predominantPitch}${rm.isMock ? " · MOCK" : ""}`
+                : "No model yet — AI-draft it, or trace the roof and Save."}
             </div>
           </div>
-          <StatusControls orderId={order.id} status={order.status as OrderStatus} />
+          <div className="rd-est-workflow-actions">
+            <AiDraftButton orderId={order.id} hasModel={!!rm} />
+            <StatusControls orderId={order.id} status={order.status as OrderStatus} />
+          </div>
         </div>
+
+        {rm?.aiDrafted && (
+          <div className="rd-est-workflow-inner" style={{ paddingTop: 0 }}>
+            <div className="rd-ai-banner">
+              ✨ <b>AI-drafted</b>{rm.confidence != null ? ` · ${Math.round(rm.confidence * 100)}% confidence` : ""}
+              {rm.source ? ` · ${rm.source}` : ""} — review &amp; correct below, then <b>Save roof model</b> to
+              verify. It can&apos;t advance to QA or delivery until a human verifies it.
+            </div>
+          </div>
+        )}
         <div className="rd-est-workflow-inner" style={{ paddingTop: 0 }}>
           <DeliverablesPanel
             orderId={order.id}
@@ -64,11 +81,13 @@ export default async function EstimatorOrderPage({
         </div>
       </div>
 
-      {/* Measure tool wired to this order */}
+      {/* Measure tool wired to this order — seeded with the saved/AI-drafted model */}
       <MeasureTool
+        key={rm?.updatedAt?.toISOString() ?? "blank"}
         orderId={order.id}
         orderDisplayId={order.displayId}
         orderAddress={order.address}
+        initialModel={initialModel}
       />
     </div>
   );
