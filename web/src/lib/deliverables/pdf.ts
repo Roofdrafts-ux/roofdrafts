@@ -72,6 +72,32 @@ export const pdfExporter: Exporter = {
     page.drawLine({ start: { x: M, y }, end: { x: width - M, y }, thickness: 0.75, color: HAIR });
     y -= 24;
 
+    // ── Summary (optional, LLM-generated) ──
+    if (data.summary) {
+      text("SUMMARY", M, y, 8, bold, INK2);
+      y -= 15;
+      const maxW = width - M * 2;
+      const words = data.summary.replace(/\s+/g, " ").trim().split(" ");
+      let line = "";
+      for (const w of words) {
+        const test = line ? `${line} ${w}` : w;
+        if (font.widthOfTextAtSize(test, 10) > maxW && line) {
+          text(line, M, y, 10, font, INK2);
+          y -= 14;
+          line = w;
+        } else {
+          line = test;
+        }
+      }
+      if (line) {
+        text(line, M, y, 10, font, INK2);
+        y -= 14;
+      }
+      y -= 12;
+      page.drawLine({ start: { x: M, y }, end: { x: width - M, y }, thickness: 0.75, color: HAIR });
+      y -= 24;
+    }
+
     // ── Line lengths ──
     text("LINE LENGTHS", M, y, 8, bold, INK2);
     y -= 18;

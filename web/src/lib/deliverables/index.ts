@@ -29,6 +29,7 @@ interface RoofModelLike {
   eaveFt: number;
   pitchData: unknown;
   isMock: boolean;
+  summary?: string | null;
 }
 
 /** Build normalized report data from persisted rows. */
@@ -57,6 +58,7 @@ export function buildReportData(
     },
     facets,
     isMock: roof.isMock,
+    summary: roof.summary ?? null,
   };
 }
 

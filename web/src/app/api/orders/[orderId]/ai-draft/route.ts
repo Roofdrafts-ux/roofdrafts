@@ -3,6 +3,7 @@ import { getSessionWithRole } from "@/lib/rbac";
 import { prisma } from "@/lib/prisma";
 import { getRoofExtractor } from "@/lib/roof-extraction";
 import { computeRoof } from "@/lib/roofcalc";
+import { generateReportSummary } from "@/lib/report-summary";
 
 /**
  * POST /api/orders/:orderId/ai-draft
@@ -38,6 +39,25 @@ export async function POST(
 
   // Derive all numbers from the drafted model via the audited engine.
   const computed = computeRoof(extracted.model);
+
+  // LLM-written summary (DeepSeek now / Gemini later; deterministic fallback if disabled).
+  const summary = await generateReportSummary({
+    displayId: order.displayId,
+    address: order.address,
+    reportType: order.reportType,
+    totalSqFt: computed.totalArea,
+    squares: computed.squares,
+    predominantPitch: computed.predominantPitch,
+    lengths: {
+      ridge: computed.byType.ridge,
+      hip: computed.byType.hip,
+      valley: computed.byType.valley,
+      rake: computed.byType.rake,
+      eave: computed.byType.eave,
+    },
+    facetCount: computed.facetCount,
+  });
+
   const data = {
     totalSqFt: computed.totalArea,
     squares: computed.squares,
@@ -58,6 +78,7 @@ export async function POST(
     aiDrafted: true,
     confidence: extracted.confidence,
     source: extracted.source,
+    summary: summary.text,
     // A fresh draft is unverified — clear any prior human sign-off.
     verifiedById: null,
     verifiedAt: null,

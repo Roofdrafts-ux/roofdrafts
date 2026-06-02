@@ -22,6 +22,8 @@ export interface RoofReportData {
   facets: Array<{ id: string; pitch: number; planArea: number; area: number }>;
   /** True when traced over mock imagery — artifacts MUST be watermarked + never delivered as real. */
   isMock: boolean;
+  /** Optional LLM-generated written summary. */
+  summary?: string | null;
 }
 
 export type DeliverableKind = "PDF" | "XACTIMATE_ESX" | "XML";

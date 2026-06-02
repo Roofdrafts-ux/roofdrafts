@@ -170,6 +170,9 @@ model RoofModel {
   verifiedById String?
   verifiedAt   DateTime?
 
+  /// LLM-generated written report summary (provider-agnostic; see lib/llm).
+  summary      String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
