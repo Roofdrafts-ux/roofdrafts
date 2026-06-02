@@ -1028,7 +1028,7 @@ export function CTAFooter({ onOrder }: { onOrder: () => void }) {
             <span className="tp-dot" style={{ color: "var(--nj2-success)", background: "var(--nj2-success)" }} /> All
             systems operational
           </span>
-          <span>Fort Worth · Denver</span>
+          <span>Fort Worth · Delaware</span>
         </div>
       </div>
     </section>

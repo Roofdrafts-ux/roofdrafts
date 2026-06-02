@@ -304,7 +304,7 @@ function CTAFooter({ onOrder }) {
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
             <span className="tp-dot" style={{ color: 'var(--nj2-success)', background: 'var(--nj2-success)' }} /> All systems operational
           </span>
-          <span>Fort Worth · Denver</span>
+          <span>Fort Worth · Delaware</span>
         </div>
       </div>
     </section>
