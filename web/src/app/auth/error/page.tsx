@@ -1,4 +1,5 @@
 "use client";
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
@@ -10,6 +11,14 @@ const MESSAGES: Record<string, string> = {
 };
 
 export default function AuthErrorPage() {
+  return (
+    <Suspense fallback={null}>
+      <AuthErrorInner />
+    </Suspense>
+  );
+}
+
+function AuthErrorInner() {
   const params = useSearchParams();
   const error = params.get("error") ?? "Default";
   const message = MESSAGES[error] ?? MESSAGES.Default;

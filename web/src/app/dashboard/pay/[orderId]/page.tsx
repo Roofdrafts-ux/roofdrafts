@@ -5,7 +5,7 @@ import { CheckoutClient } from "@/components/checkout/CheckoutClient";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import "../../dashboard.css";
-import "./pay.css";
+import "../pay.css";
 
 export const metadata = { title: "Pay — Roofdrafts" };
 
