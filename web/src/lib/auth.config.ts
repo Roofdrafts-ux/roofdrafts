@@ -6,6 +6,9 @@
 import type { NextAuthConfig } from "next-auth";
 
 export const authConfig: NextAuthConfig = {
+  // Required behind a hosting proxy (Netlify/Vercel) — without it NextAuth v5
+  // rejects requests with "UntrustedHost" in production.
+  trustHost: true,
   pages: {
     signIn: "/auth/signin",
     error: "/auth/error",
@@ -16,7 +19,11 @@ export const authConfig: NextAuthConfig = {
       const isLoggedIn = !!auth?.user;
       const pathname = nextUrl.pathname;
 
-      const PUBLIC = ["/", "/auth", "/legal", "/pricing", "/how-it-works", "/unauthorized", "/api/auth"];
+      // API routes enforce their own auth in the handler and must return JSON
+      // (401/403), not an HTML redirect — let them through the proxy.
+      if (pathname.startsWith("/api")) return true;
+
+      const PUBLIC = ["/", "/auth", "/legal", "/pricing", "/how-it-works", "/unauthorized"];
       const isPublic = PUBLIC.some((p) => pathname.startsWith(p)) ||
         pathname.startsWith("/_next") || pathname.startsWith("/favicon");
 
