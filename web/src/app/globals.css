@@ -3,7 +3,7 @@
    Warm paper · ink · clay (roof-tile) accent · blueprint navy
    ================================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@1,18..40,400;1,18..40,500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;700&family=Inter:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@1,18..40,400;1,18..40,500&display=swap');
 
 :root {
   /* ───── Fonts ───── */
@@ -11,6 +11,8 @@
   --nj2-font-body:    "Hanken Grotesk", system-ui, sans-serif;
   --nj2-font-mono:    "JetBrains Mono", ui-monospace, monospace;
   --nj2-font-serif:   "Newsreader", Georgia, serif;
+  /* Logo wordmark — Inter (Stripe-style neo-grotesque) so the brand stands out. */
+  --nj2-font-logo:    "Inter", system-ui, sans-serif;
 
   /* ───── Warm paper neutral ramp ───── */
   --nj2-ink-0:   #FFFFFF;

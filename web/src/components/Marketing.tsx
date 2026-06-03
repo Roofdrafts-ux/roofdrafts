@@ -49,7 +49,7 @@ export function Nav({ onOrder }: { onOrder: () => void }) {
           gap: 28,
         }}
       >
-        <Wordmark size={28} />
+        <Wordmark size={42} />
         <nav style={{ display: "flex", gap: 2, marginLeft: 8 }} className="tp-nav-desktop">
           {links.map(([l, h]) => (
             <a key={l} href={h} className="tp-navlink">

@@ -129,16 +129,16 @@ export function RoofMark({ size = 30, light = false }: { size?: number; light?: 
   );
 }
 
-export function Wordmark({ light = false, size = 30 }: { light?: boolean; size?: number }) {
+export function Wordmark({ light = false, size = 38 }: { light?: boolean; size?: number }) {
   return (
-    <a href="#top" style={{ display: "inline-flex", alignItems: "center", gap: 9 }}>
+    <a href="#top" style={{ display: "inline-flex", alignItems: "center", gap: size * 0.28 }}>
       <RoofMark size={size} light={light} />
       <span
         style={{
-          fontFamily: "var(--nj2-font-display)",
-          fontWeight: 600,
-          fontSize: size * 0.6,
-          letterSpacing: "-.03em",
+          fontFamily: "var(--nj2-font-logo)",
+          fontWeight: 700,
+          fontSize: size * 0.62,
+          letterSpacing: "-.022em",
           color: light ? "#fff" : "var(--nj2-fg-1)",
         }}
       >

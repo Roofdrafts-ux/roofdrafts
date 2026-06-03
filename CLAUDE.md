@@ -61,6 +61,19 @@ Governing briefs: `CLAUDE-CODE-PROMPT-v2.md` + `MASTER-PLAN.md` (the original v1
 - Custom domain `roofdrafts.com` via Netlify DNS (registrar nameservers → `dns1–4.p02.nsone.net`).
 - First admin: add the email to `BOOTSTRAP_ADMIN_EMAILS`; it gets ADMIN on signup (ADMIN outranks ESTIMATOR).
 
+## Brand & logo
+- **Wordmark** = "roof" + "drafts" (second word in a muted tone) next to the `RoofMark` icon. The
+  reusable component is `Wordmark` in `src/components/primitives.tsx` (`size` prop scales icon + text).
+- **Logo font**: `--nj2-font-logo` = **Inter** (Stripe-style neo-grotesque), weight **700**, tracking
+  `-0.022em`. Loaded via the Google Fonts `@import` in `globals.css`. Use this var for ALL brand
+  wordmarks — do NOT revert the logo to `--nj2-font-display` (Space Grotesk stays for headings only).
+- **Sizing (industry-standard, prominent header logo)**: nav `Wordmark size={42}`, footer `size={34}`.
+  CSS wordmarks: auth `28px`, dashboard `24px`, estimator/admin `23px`. Keep the logo noticeably
+  larger than nav/body text so it stands out.
+- **Colors**: primary clay `--nj2-brand-500 #BE5630`; "roof" uses ink, "drafts" the muted ink tone.
+- **Favicon**: `src/app/icon.svg` (clay rounded square + white roof glyph) + `src/app/apple-icon.tsx`
+  (PNG via `ImageResponse`, since the apple-icon convention needs raster). No `favicon.ico`.
+
 ## Status
 Phases 1–5 complete (marketing, geometry+measure tool, auth/RBAC/Stripe/consent/dashboard, estimator
 console + deliverables, admin + pricing/coverage + tests) plus payment + transactional email + live

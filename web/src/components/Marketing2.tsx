@@ -958,7 +958,7 @@ export function CTAFooter({ onOrder }: { onOrder: () => void }) {
           }}
         >
           <div>
-            <Wordmark light size={28} />
+            <Wordmark light size={34} />
             <div style={{ fontSize: 13, color: "#A6A6AE", marginTop: 14, maxWidth: 250, lineHeight: 1.55 }}>
               Precision roof diagrams &amp; reports for the people who build, restore and adjust.
             </div>

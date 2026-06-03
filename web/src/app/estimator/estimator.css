@@ -31,10 +31,10 @@
   display: flex;
   align-items: baseline;
   gap: 1px;
-  font-family: var(--nj2-font-display);
-  font-size: 18px;
+  font-family: var(--nj2-font-logo);
+  font-size: 23px;
   font-weight: 700;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.022em;
   text-decoration: none;
 }
 .rd-est-brand-roof   { color: var(--nj2-ink-900); }
