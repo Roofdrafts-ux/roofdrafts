@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionWithRole } from "@/lib/rbac";
 import { prisma } from "@/lib/prisma";
+import { writeAudit, ipFromHeaders } from "@/lib/audit";
 import type { Role } from "@/generated/prisma/enums";
 
 const VALID: Role[] = ["CUSTOMER", "ESTIMATOR", "ADMIN"];
@@ -40,6 +41,16 @@ export async function PATCH(
     where: { id: userId },
     data: { role },
     select: { id: true, email: true, name: true, role: true },
+  });
+
+  await writeAudit({
+    actorId: session.user.id,
+    actorEmail: session.user.email,
+    action: "user.role.update",
+    targetType: "user",
+    targetId: userId,
+    meta: { from: user.role, to: role, targetEmail: user.email },
+    ip: ipFromHeaders(req.headers),
   });
 
   return NextResponse.json({ user: updated });

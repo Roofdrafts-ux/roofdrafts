@@ -74,6 +74,18 @@ Governing briefs: `CLAUDE-CODE-PROMPT-v2.md` + `MASTER-PLAN.md` (the original v1
 - **Favicon**: `src/app/icon.svg` (clay rounded square + white roof glyph) + `src/app/apple-icon.tsx`
   (PNG via `ImageResponse`, since the apple-icon convention needs raster). No `favicon.ico`.
 
+## Admin control plane (build in progress — phased)
+Target: full B2B control plane. Tenancy model = **every customer gets an Organization** (individuals =
+org-of-one; companies = multi-member). Billing = per-report (individuals) + consolidated **invoicing**
+(companies). Phases: 1 Foundation ✓ · 2 Tenancy (orgs/members/invites) · 3 Billing · 4 Governance/ops.
+- **Settings** (`lib/settings.ts`, `Setting` table, `/admin/settings`): owner-editable business config,
+  resolves DB → env → default. Registry = `SETTINGS[]`. NEVER store secrets here (env only).
+  Wired: `lead_alert_emails` (company-signup alerts), `order_emails_enabled` (notify.ts gate),
+  `booking_url` (returned by signup API server-side → gated, never `NEXT_PUBLIC`).
+- **Audit** (`lib/audit.ts` `writeAudit`, `AuditLog` table, `/admin/audit`): append-only log of
+  privileged actions. Already hooked: `user.signup`, `user.role.update`, `setting.update`. Add a
+  `writeAudit(...)` call to every new privileged mutation.
+
 ## Status
 Phases 1–5 complete (marketing, geometry+measure tool, auth/RBAC/Stripe/consent/dashboard, estimator
 console + deliverables, admin + pricing/coverage + tests) plus payment + transactional email + live

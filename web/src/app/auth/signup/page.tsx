@@ -11,8 +11,6 @@ const VOLUMES: { value: string; label: string }[] = [
   { value: "5-20", label: "5–20 reports / month" },
   { value: "20+", label: "20+ reports / month" },
 ];
-const BOOKING_URL = process.env.NEXT_PUBLIC_BOOKING_URL ?? "";
-
 export default function SignUpPage() {
   const router = useRouter();
   const [name, setName] = useState("");
@@ -25,6 +23,7 @@ export default function SignUpPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [bookingLead, setBookingLead] = useState(false);
+  const [bookingUrl, setBookingUrl] = useState("");
 
   const isCompany = accountType === "company";
 
@@ -54,10 +53,13 @@ export default function SignUpPage() {
       return;
     }
 
+    const data = await res.json().catch(() => ({} as { bookingUrl?: string }));
+
     // Sign in (no auto-redirect) so we can route company leads to a booking step.
     await signIn("credentials", { email, password, redirect: false });
 
     if (isCompany) {
+      setBookingUrl(data.bookingUrl ?? "");
       setBookingLead(true);
       setLoading(false);
     } else {
@@ -86,8 +88,8 @@ export default function SignUpPage() {
           </p>
 
           {monthlyVolume !== "1-5" && (
-            BOOKING_URL ? (
-              <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer"
+            bookingUrl ? (
+              <a href={bookingUrl} target="_blank" rel="noopener noreferrer"
                  className="nj2-btn nj2-btn-brand nj2-btn-lg rd-auth-submit">
                 Book a 15-min onboarding call
               </a>

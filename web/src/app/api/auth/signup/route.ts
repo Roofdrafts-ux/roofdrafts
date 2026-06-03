@@ -3,6 +3,8 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { rateLimit, clientIp } from "@/lib/rate-limit";
 import { getEmailer } from "@/lib/email";
+import { getEmails, getSetting } from "@/lib/settings";
+import { writeAudit } from "@/lib/audit";
 
 const ACCOUNT_TYPES = new Set(["individual", "company"]);
 const VOLUMES = new Set(["1-5", "5-20", "20+"]);
@@ -15,10 +17,7 @@ async function alertCompanyLead(lead: {
   monthlyVolume?: string | null;
 }): Promise<void> {
   try {
-    const recipients = (process.env.LEAD_ALERT_EMAILS ?? process.env.BOOTSTRAP_ADMIN_EMAILS ?? "")
-      .split(",")
-      .map((e) => e.trim())
-      .filter(Boolean);
+    const recipients = await getEmails("lead_alert_emails");
     if (recipients.length === 0) return;
 
     const rows = [
@@ -128,12 +127,28 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    await writeAudit({
+      actorId: user.id,
+      actorEmail: email,
+      action: "user.signup",
+      targetType: "user",
+      targetId: user.id,
+      meta: { accountType: acct, companyName: company, monthlyVolume: volume, role },
+      ip: ip === "unknown" ? null : ip,
+    });
+
     // Company signups → alert the team for immediate follow-up (best-effort).
     if (isCompany) {
       await alertCompanyLead({ name: name ?? null, email, companyName: company, monthlyVolume: volume });
     }
 
-    return NextResponse.json({ ok: true, accountType: acct, monthlyVolume: volume }, { status: 201 });
+    // Booking link for high-volume company leads — resolved server-side (gated, never public).
+    const bookingUrl = isCompany && volume && volume !== "1-5" ? await getSetting("booking_url") : "";
+
+    return NextResponse.json(
+      { ok: true, accountType: acct, monthlyVolume: volume, bookingUrl },
+      { status: 201 }
+    );
   } catch (err) {
     console.error("[signup]", err);
     return NextResponse.json({ error: "Internal server error." }, { status: 500 });

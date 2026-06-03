@@ -1,6 +1,7 @@
 import "server-only";
 import { prisma } from "./prisma";
 import { notifyOrderEvent } from "./email";
+import { getBool } from "./settings";
 import { TURNAROUND_LABEL } from "./pricing";
 import type { OrderEmailEvent } from "./email/types";
 
@@ -12,6 +13,9 @@ const APP_URL = process.env.AUTH_URL ?? "http://localhost:3000";
  */
 export async function notifyForOrder(orderId: string, event: OrderEmailEvent): Promise<void> {
   try {
+    // Owner can disable customer lifecycle emails from admin Settings.
+    if (!(await getBool("order_emails_enabled"))) return;
+
     const order = await prisma.order.findUnique({
       where: { id: orderId },
       include: { user: { select: { email: true, name: true } } },

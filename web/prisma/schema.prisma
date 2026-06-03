@@ -217,3 +217,34 @@ model ConsentRecord {
 
   @@map("consent_records")
 }
+
+/// Owner-editable business configuration (key/value). Read at runtime with env/default
+/// fallback via lib/settings. NEVER stores secrets — those stay in env vars.
+model Setting {
+  key         String   @id
+  /// String value (JSON-encoded for non-string types).
+  value       String
+  updatedById String?
+  updatedAt   DateTime @updatedAt @default(now())
+
+  @@map("settings")
+}
+
+/// Tamper-evident record of every privileged action (role changes, settings edits,
+/// status transitions, deliveries, etc.). Append-only by convention.
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  actorEmail String?
+  /// Dotted action key, e.g. "user.role.update", "setting.update", "order.status.update".
+  action     String
+  targetType String?
+  targetId   String?
+  meta       Json?
+  ip         String?
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([action])
+  @@map("audit_logs")
+}

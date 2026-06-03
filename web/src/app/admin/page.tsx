@@ -54,6 +54,8 @@ export default async function AdminDashboardPage() {
             <Link href="/admin" className="rd-admin-navlink rd-admin-navlink-active">Overview</Link>
             <Link href="/admin/users" className="rd-admin-navlink">Users</Link>
             <Link href="/admin/pricing" className="rd-admin-navlink">Pricing</Link>
+            <Link href="/admin/settings" className="rd-admin-navlink">Settings</Link>
+            <Link href="/admin/audit" className="rd-admin-navlink">Audit</Link>
             <span className="rd-admin-user">{session.user.name ?? session.user.email}</span>
             <SignOutButton />
           </nav>
