@@ -21,6 +21,11 @@ export function App() {
     r.setAttribute("data-theme", "light");
   }, []);
 
+  // Deep-link: /?order=1 (e.g. the dashboard "Order a report" button) opens the modal directly.
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("order") === "1") setOrderOpen(true);
+  }, []);
+
   const openOrder = () => setOrderOpen(true);
 
   return (

@@ -5,14 +5,28 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+type AccountType = "individual" | "company";
+const VOLUMES: { value: string; label: string }[] = [
+  { value: "1-5", label: "1–5 reports / month" },
+  { value: "5-20", label: "5–20 reports / month" },
+  { value: "20+", label: "20+ reports / month" },
+];
+const BOOKING_URL = process.env.NEXT_PUBLIC_BOOKING_URL ?? "";
+
 export default function SignUpPage() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [accountType, setAccountType] = useState<AccountType>("individual");
+  const [companyName, setCompanyName] = useState("");
+  const [monthlyVolume, setMonthlyVolume] = useState("1-5");
   const [agree, setAgree] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [bookingLead, setBookingLead] = useState(false);
+
+  const isCompany = accountType === "company";
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -23,7 +37,14 @@ export default function SignUpPage() {
     const res = await fetch("/api/auth/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify({
+        name,
+        email,
+        password,
+        accountType,
+        companyName: isCompany ? companyName : undefined,
+        monthlyVolume: isCompany ? monthlyVolume : undefined,
+      }),
     });
 
     if (!res.ok) {
@@ -33,17 +54,61 @@ export default function SignUpPage() {
       return;
     }
 
-    // Auto sign-in after successful signup
-    await signIn("credentials", {
-      email,
-      password,
-      callbackUrl: "/dashboard",
-      redirect: true,
-    });
+    // Sign in (no auto-redirect) so we can route company leads to a booking step.
+    await signIn("credentials", { email, password, redirect: false });
+
+    if (isCompany) {
+      setBookingLead(true);
+      setLoading(false);
+    } else {
+      router.push("/dashboard");
+    }
   }
 
   async function handleGoogle() {
     await signIn("google", { callbackUrl: "/dashboard" });
+  }
+
+  // ── Post-signup booking step for company leads ──
+  if (bookingLead) {
+    return (
+      <div className="rd-auth-shell">
+        <div className="rd-auth-card">
+          <div className="rd-auth-brand">
+            <span className="rd-auth-brand-roof">roof</span>
+            <span className="rd-auth-brand-drafts">drafts</span>
+          </div>
+          <h1 className="rd-auth-heading">You&apos;re all set{name ? `, ${name.split(" ")[0]}` : ""} 👋</h1>
+          <p className="rd-auth-sub">
+            {monthlyVolume === "1-5"
+              ? "Your account is ready — order your first report anytime."
+              : "For your volume, we offer dedicated estimators, consolidated billing and volume pricing. Let's get you set up."}
+          </p>
+
+          {monthlyVolume !== "1-5" && (
+            BOOKING_URL ? (
+              <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer"
+                 className="nj2-btn nj2-btn-brand nj2-btn-lg rd-auth-submit">
+                Book a 15-min onboarding call
+              </a>
+            ) : (
+              <p className="rd-auth-sub" style={{ marginTop: 8 }}>
+                Our team will reach out shortly to set up your account.
+              </p>
+            )
+          )}
+
+          <button
+            type="button"
+            className="nj2-btn nj2-btn-lg rd-auth-submit"
+            style={{ marginTop: 10, background: "transparent", color: "var(--tp-accent, #BE5630)", border: "1px solid var(--tp-accent, #BE5630)" }}
+            onClick={() => router.push("/dashboard")}
+          >
+            Continue to dashboard
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -69,6 +134,37 @@ export default function SignUpPage() {
         <div className="rd-auth-divider"><span>or</span></div>
 
         <form onSubmit={handleSubmit} className="rd-auth-form">
+          {/* Account type — segmentation (display/routing only) */}
+          <div className="rd-field">
+            <span className="rd-field-label">I&apos;m signing up as</span>
+            <div role="group" aria-label="Account type" style={{ display: "flex", gap: 8 }}>
+              {(["individual", "company"] as AccountType[]).map((t) => {
+                const active = accountType === t;
+                return (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => setAccountType(t)}
+                    aria-pressed={active}
+                    style={{
+                      flex: 1,
+                      padding: "10px 12px",
+                      borderRadius: 10,
+                      cursor: "pointer",
+                      fontWeight: 600,
+                      fontSize: 14,
+                      border: active ? "1.5px solid var(--tp-accent, #BE5630)" : "1px solid #d8d2c7",
+                      background: active ? "var(--tp-accent-soft, #FBECE4)" : "#fff",
+                      color: active ? "var(--tp-accent-600, #A2451F)" : "#5a544a",
+                    }}
+                  >
+                    {t === "individual" ? "Individual" : "Company"}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           <label className="rd-field">
             <span className="rd-field-label">Name</span>
             <input
@@ -82,8 +178,37 @@ export default function SignUpPage() {
             />
           </label>
 
+          {isCompany && (
+            <>
+              <label className="rd-field">
+                <span className="rd-field-label">Company name</span>
+                <input
+                  type="text"
+                  autoComplete="organization"
+                  value={companyName}
+                  onChange={(e) => setCompanyName(e.target.value)}
+                  className="rd-input"
+                  placeholder="Acme Roofing"
+                />
+              </label>
+
+              <label className="rd-field">
+                <span className="rd-field-label">Reports per month</span>
+                <select
+                  value={monthlyVolume}
+                  onChange={(e) => setMonthlyVolume(e.target.value)}
+                  className="rd-input"
+                >
+                  {VOLUMES.map((v) => (
+                    <option key={v.value} value={v.value}>{v.label}</option>
+                  ))}
+                </select>
+              </label>
+            </>
+          )}
+
           <label className="rd-field">
-            <span className="rd-field-label">Work email</span>
+            <span className="rd-field-label">Email</span>
             <input
               type="email"
               required
@@ -91,7 +216,7 @@ export default function SignUpPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="rd-input"
-              placeholder="you@company.com"
+              placeholder="you@example.com"
             />
           </label>
 

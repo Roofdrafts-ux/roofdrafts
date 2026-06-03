@@ -2,6 +2,45 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { rateLimit, clientIp } from "@/lib/rate-limit";
+import { getEmailer } from "@/lib/email";
+
+const ACCOUNT_TYPES = new Set(["individual", "company"]);
+const VOLUMES = new Set(["1-5", "5-20", "20+"]);
+
+/** Notify the team about a new company lead (best-effort; never blocks signup). */
+async function alertCompanyLead(lead: {
+  name?: string | null;
+  email: string;
+  companyName?: string | null;
+  monthlyVolume?: string | null;
+}): Promise<void> {
+  try {
+    const recipients = (process.env.LEAD_ALERT_EMAILS ?? process.env.BOOTSTRAP_ADMIN_EMAILS ?? "")
+      .split(",")
+      .map((e) => e.trim())
+      .filter(Boolean);
+    if (recipients.length === 0) return;
+
+    const rows = [
+      ["Name", lead.name ?? "—"],
+      ["Email", lead.email],
+      ["Company", lead.companyName ?? "—"],
+      ["Monthly volume", lead.monthlyVolume ?? "—"],
+    ];
+    const subject = `New company lead: ${lead.companyName || lead.name || lead.email}`;
+    const html =
+      `<h2 style="font-family:sans-serif">New Roofdrafts company signup</h2>` +
+      `<table style="font-family:sans-serif;border-collapse:collapse">` +
+      rows.map(([k, v]) => `<tr><td style="padding:4px 12px 4px 0;color:#777">${k}</td><td style="padding:4px 0"><b>${v}</b></td></tr>`).join("") +
+      `</table><p style="font-family:sans-serif;color:#777">Follow up promptly — high-volume accounts are the priority lane.</p>`;
+    const text = rows.map(([k, v]) => `${k}: ${v}`).join("\n");
+
+    const emailer = getEmailer();
+    await Promise.all(recipients.map((to) => emailer.send({ to, subject, html, text })));
+  } catch (e) {
+    console.warn(`[signup] lead alert failed: ${(e as Error).message}`);
+  }
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,11 +54,20 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { name, email, password } = body as {
+    const { name, email, password, accountType, companyName, monthlyVolume } = body as {
       name?: string;
       email?: string;
       password?: string;
+      accountType?: string;
+      companyName?: string;
+      monthlyVolume?: string;
     };
+
+    // Normalize self-reported segmentation (never trusted for authz — display/routing only).
+    const acct = accountType && ACCOUNT_TYPES.has(accountType) ? accountType : null;
+    const isCompany = acct === "company";
+    const company = isCompany && companyName?.trim() ? companyName.trim().slice(0, 120) : null;
+    const volume = isCompany && monthlyVolume && VOLUMES.has(monthlyVolume) ? monthlyVolume : null;
 
     // ── Validate ──────────────────────────────────────────────────
     if (!email || !password) {
@@ -50,6 +98,9 @@ export async function POST(req: NextRequest) {
         email,
         name: name ?? null,
         role,
+        accountType: acct,
+        companyName: company,
+        monthlyVolume: volume,
         accounts: {
           create: {
             type: "credentials",
@@ -77,7 +128,12 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({ ok: true }, { status: 201 });
+    // Company signups → alert the team for immediate follow-up (best-effort).
+    if (isCompany) {
+      await alertCompanyLead({ name: name ?? null, email, companyName: company, monthlyVolume: volume });
+    }
+
+    return NextResponse.json({ ok: true, accountType: acct, monthlyVolume: volume }, { status: 201 });
   } catch (err) {
     console.error("[signup]", err);
     return NextResponse.json({ error: "Internal server error." }, { status: 500 });

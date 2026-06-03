@@ -63,7 +63,7 @@ export default async function DashboardPage() {
                 : `${orders.length} ${orders.length === 1 ? "report" : "reports"}`}
             </p>
           </div>
-          <Link href="/" className="nj2-btn nj2-btn-brand">
+          <Link href="/?order=1" className="nj2-btn nj2-btn-brand">
             + Order a report
           </Link>
         </div>
@@ -74,7 +74,7 @@ export default async function DashboardPage() {
             <p className="rd-dash-empty-text">
               Your delivered PDF, Xactimate ESX and XML files will appear here.
             </p>
-            <Link href="/" className="nj2-btn nj2-btn-brand">
+            <Link href="/?order=1" className="nj2-btn nj2-btn-brand">
               Order your first report
             </Link>
           </div>
