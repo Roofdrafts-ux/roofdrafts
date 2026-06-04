@@ -64,7 +64,7 @@ export default async function CustomerBillingPage() {
                   <td>{usd(i.totalUsd)}</td>
                   <td>{i.status}</td>
                   <td className="rd-dim">{fmt(i.dueAt)}</td>
-                  <td><a href={`/api/invoices/${i.id}/pdf`} target="_blank" rel="noreferrer" className="rd-auth-link">PDF</a></td>
+                  <td><a href={`/api/invoices/${i.id}/pdf`} target="_blank" rel="noreferrer" style={{ color: "var(--nj2-brand-600,#A2451F)", fontWeight: 600, textDecoration: "none" }}>PDF ↗</a></td>
                 </tr>
               ))}
             </tbody>

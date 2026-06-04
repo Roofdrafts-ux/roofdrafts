@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionWithRole } from "@/lib/rbac";
 import { prisma } from "@/lib/prisma";
+import { writeAudit, ipFromHeaders } from "@/lib/audit";
 
 /** POST /api/orders/:orderId/claim — estimator claims an unassigned order. */
 export async function POST(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ orderId: string }> }
 ) {
   const session = await getSessionWithRole("ESTIMATOR");
@@ -13,25 +14,35 @@ export async function POST(
   }
 
   const { orderId } = await params;
-  const order = await prisma.order.findUnique({ where: { id: orderId } });
-  if (!order) {
-    return NextResponse.json({ error: "Order not found." }, { status: 404 });
-  }
 
-  // Already claimed by someone else?
-  if (order.assignedEstimatorId && order.assignedEstimatorId !== session.user.id) {
-    return NextResponse.json({ error: "Order already claimed." }, { status: 409 });
-  }
-
-  const updated = await prisma.order.update({
-    where: { id: orderId },
-    data: {
-      assignedEstimatorId: session.user.id,
-      claimedAt: new Date(),
-      status: order.status === "PENDING" ? "MODELING" : order.status,
+  // Atomic claim: only succeeds if currently unassigned (or already mine). Prevents two
+  // estimators from claiming the same order (TOCTOU-safe via guarded updateMany).
+  const claim = await prisma.order.updateMany({
+    where: {
+      id: orderId,
+      OR: [{ assignedEstimatorId: null }, { assignedEstimatorId: session.user.id }],
     },
+    data: { assignedEstimatorId: session.user.id, claimedAt: new Date() },
   });
 
+  if (claim.count === 0) {
+    const exists = await prisma.order.findUnique({ where: { id: orderId }, select: { id: true } });
+    return exists
+      ? NextResponse.json({ error: "Order already claimed." }, { status: 409 })
+      : NextResponse.json({ error: "Order not found." }, { status: 404 });
+  }
+
+  // Move PENDING → MODELING (guarded so we don't clobber a later status).
+  await prisma.order.updateMany({
+    where: { id: orderId, status: "PENDING" },
+    data: { status: "MODELING" },
+  });
+
+  const updated = await prisma.order.findUnique({ where: { id: orderId } });
+  await writeAudit({
+    actorId: session.user.id, actorEmail: session.user.email, action: "order.claim",
+    targetType: "order", targetId: orderId, ip: ipFromHeaders(req.headers),
+  });
   return NextResponse.json({ order: updated });
 }
 

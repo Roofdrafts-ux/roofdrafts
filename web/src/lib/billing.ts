@@ -16,34 +16,56 @@ export async function unbilledOrders(organizationId: string) {
   });
 }
 
-async function nextInvoiceNumber(): Promise<string> {
-  const count = await prisma.invoice.count();
-  return `INV-${String(count + 1).padStart(4, "0")}`;
-}
-
-/** Roll all of an org's unbilled orders into a single DRAFT invoice. Returns null if none. */
+/**
+ * Roll all of an org's unbilled orders into a single DRAFT invoice. Returns null if none.
+ * Race-safe: runs in a transaction, attaches orders with a guarded `invoiceId IS NULL` write
+ * (so two concurrent runs can't double-bill the same order), recomputes totals from what
+ * actually attached, and retries on invoice-number unique collisions.
+ */
 export async function generateInvoiceForOrg(organizationId: string) {
-  const orders = await unbilledOrders(organizationId);
-  if (orders.length === 0) return null;
-
-  const subtotal = orders.reduce((s, o) => s + (o.priceUsd ?? 0), 0);
   const pct = Math.min(100, Math.max(0, await num("company_volume_discount_pct", 0)));
-  const discount = Math.round((subtotal * pct) / 100);
-  const total = subtotal - discount;
   const netDays = await num("invoice_net_days", 15);
 
-  return prisma.invoice.create({
-    data: {
-      number: await nextInvoiceNumber(),
-      organizationId,
-      subtotalUsd: subtotal,
-      discountUsd: discount,
-      totalUsd: total,
-      dueAt: new Date(Date.now() + netDays * 24 * 60 * 60 * 1000),
-      orders: { connect: orders.map((o) => ({ id: o.id })) },
-    },
-    include: { orders: true },
-  });
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      return await prisma.$transaction(async (tx) => {
+        const orders = await tx.order.findMany({
+          where: { organizationId, invoiceId: null, paymentStatus: { not: "PAID" } },
+        });
+        if (orders.length === 0) return null;
+
+        const count = await tx.invoice.count();
+        const invoice = await tx.invoice.create({
+          data: {
+            number: `INV-${String(count + 1).padStart(4, "0")}`,
+            organizationId,
+            dueAt: new Date(Date.now() + netDays * 24 * 60 * 60 * 1000),
+          },
+        });
+
+        // Attach only orders that are still unbilled — a concurrent invoice can't steal them.
+        await tx.order.updateMany({
+          where: { id: { in: orders.map((o) => o.id) }, invoiceId: null },
+          data: { invoiceId: invoice.id },
+        });
+        const attached = await tx.order.findMany({ where: { invoiceId: invoice.id } });
+        if (attached.length === 0) throw new Error("RACE_EMPTY");
+
+        const subtotal = attached.reduce((s, o) => s + (o.priceUsd ?? 0), 0);
+        const discount = Math.round((subtotal * pct) / 100);
+        return tx.invoice.update({
+          where: { id: invoice.id },
+          data: { subtotalUsd: subtotal, discountUsd: discount, totalUsd: subtotal - discount },
+          include: { orders: true },
+        });
+      });
+    } catch (e) {
+      if ((e as Error).message === "RACE_EMPTY") return null;
+      if (attempt < 2 && (e as { code?: string }).code === "P2002") continue; // dup number, retry
+      throw e;
+    }
+  }
+  return null;
 }
 
 /** Transition an invoice; PAID marks its orders paid, VOID releases them back to unbilled. */
@@ -62,7 +84,11 @@ export async function setInvoiceStatus(invoiceId: string, status: InvoiceStatus)
     return prisma.invoice.update({ where: { id: invoiceId }, data: { status, sentAt: new Date() } });
   }
   if (status === "VOID") {
-    await prisma.order.updateMany({ where: { invoiceId }, data: { invoiceId: null } });
+    // Release orders back to unbilled and clear any payment stamped by this invoice.
+    await prisma.order.updateMany({
+      where: { invoiceId },
+      data: { invoiceId: null, paymentStatus: "UNPAID", paidAt: null },
+    });
     return prisma.invoice.update({ where: { id: invoiceId }, data: { status } });
   }
   return prisma.invoice.update({ where: { id: invoiceId }, data: { status } });

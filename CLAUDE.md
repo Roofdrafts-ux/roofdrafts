@@ -77,7 +77,15 @@ Governing briefs: `CLAUDE-CODE-PROMPT-v2.md` + `MASTER-PLAN.md` (the original v1
 ## Admin control plane (build in progress — phased)
 Target: full B2B control plane. Tenancy model = **every customer gets an Organization** (individuals =
 org-of-one; companies = multi-member). Billing = per-report (individuals) + consolidated **invoicing**
-(companies). Phases: 1 Foundation ✓ · 2 Tenancy ✓ · 3 Billing ✓ · 4 Governance/ops.
+(companies). Phases: 1 Foundation ✓ · 2 Tenancy ✓ · 3 Billing ✓ · 4 Governance/ops (core ✓).
+- **Phase 4 core**: GDPR `/api/account/export` (JSON) + `/api/account/delete-request` (audited, admin-
+  processed — no auto hard-delete) + `/dashboard/account`; branded `error.tsx`/`global-error.tsx`/
+  `not-found.tsx`. DEFERRED (need external accounts / larger): in-app TOTP 2FA, Sentry SDK, outbound webhooks.
+- **Audit hardening done** (post-review): payment gate + org-scoped deliverable downloads; atomic claim
+  (guarded updateMany); JWT re-reads role each call (demotions take effect now); invoice generation is
+  transactional + race-safe + retry on number collision; VOID resets order payment; invoice state machine
+  (PAID/VOID terminal); deliverable-gen blocked for mock/unverified; email lowercased at signup+login;
+  numeric Settings validated; order status/claim audited. Marketing nav now has Sign in / Sign up.
 - **Login routing**: `/go` (server) sends each role home (ADMIN→/admin, ESTIMATOR→/estimator, else
   /dashboard). signin/signup default `callbackUrl` = `/go`; explicit callbackUrl (invite) preserved.
 - **Billing** (`lib/billing.ts`, `Invoice` model + `Order.invoiceId`): individuals pay per-report at

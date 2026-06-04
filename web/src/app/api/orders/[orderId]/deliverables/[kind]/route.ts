@@ -28,17 +28,31 @@ export async function GET(
 
   const order = await prisma.order.findUnique({
     where: { id: orderId },
-    include: { roofModel: true },
+    include: { roofModel: true, organization: true },
   });
   if (!order || !order.roofModel) {
     return NextResponse.json({ error: "Not found." }, { status: 404 });
   }
 
-  // RBAC: estimators/admins always; customers only their own DELIVERED orders.
+  // RBAC: estimators/admins always. Customers: must belong to the order (owner OR same-org
+  // member), it must be DELIVERED, and paid — individuals pay per report; companies are billed
+  // by invoice, so their delivered orders are downloadable.
   const role = session.user.role;
   const isStaff = role === "ESTIMATOR" || role === "ADMIN";
-  const isOwner = order.userId === session.user.id;
-  if (!isStaff && !(isOwner && order.status === "DELIVERED")) {
+  let allowed = isStaff;
+  if (!allowed) {
+    let belongs = order.userId === session.user.id;
+    if (!belongs && order.organizationId) {
+      const m = await prisma.organizationMember.findUnique({
+        where: { organizationId_userId: { organizationId: order.organizationId, userId: session.user.id } },
+      });
+      belongs = !!m;
+    }
+    const isCompany = order.organization?.type === "COMPANY";
+    const paid = order.paymentStatus === "PAID" || isCompany;
+    allowed = belongs && order.status === "DELIVERED" && paid;
+  }
+  if (!allowed) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

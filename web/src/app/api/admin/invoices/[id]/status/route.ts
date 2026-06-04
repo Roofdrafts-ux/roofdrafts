@@ -18,6 +18,19 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const status = (await req.json().catch(() => ({})))?.status as InvoiceStatus;
   if (!VALID.includes(status)) return NextResponse.json({ error: "Invalid status." }, { status: 400 });
 
+  // Enforce a simple state machine — PAID and VOID are terminal.
+  const current = await prisma.invoice.findUnique({ where: { id }, select: { status: true } });
+  if (!current) return NextResponse.json({ error: "Invoice not found." }, { status: 404 });
+  const ALLOWED: Record<InvoiceStatus, InvoiceStatus[]> = {
+    DRAFT: ["SENT", "PAID", "VOID"],
+    SENT: ["PAID", "VOID"],
+    PAID: [],
+    VOID: [],
+  };
+  if (!ALLOWED[current.status].includes(status)) {
+    return NextResponse.json({ error: `Cannot move an invoice from ${current.status} to ${status}.` }, { status: 422 });
+  }
+
   const invoice = await setInvoiceStatus(id, status);
   if (!invoice) return NextResponse.json({ error: "Invoice not found." }, { status: 404 });
 

@@ -3,6 +3,7 @@ import { getSessionWithRole } from "@/lib/rbac";
 import { prisma } from "@/lib/prisma";
 import { validateTransition } from "@/lib/order-status";
 import { notifyForOrder } from "@/lib/notify";
+import { writeAudit, ipFromHeaders } from "@/lib/audit";
 import type { OrderStatus } from "@/generated/prisma/enums";
 
 const VALID: OrderStatus[] = [
@@ -51,6 +52,13 @@ export async function PATCH(
       status: next,
       deliveredAt: next === "DELIVERED" ? new Date() : order.deliveredAt,
     },
+  });
+
+  await writeAudit({
+    actorId: session.user.id, actorEmail: session.user.email, action: "order.status.update",
+    targetType: "order", targetId: orderId,
+    meta: { from: order.status, to: next, displayId: order.displayId },
+    ip: ipFromHeaders(req.headers),
   });
 
   // Lifecycle emails (best-effort).

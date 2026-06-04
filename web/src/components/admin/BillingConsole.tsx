@@ -51,7 +51,7 @@ export function BillingConsole({ companies, invoices }: { companies: CompanyRow[
                   <td>{usd(c.unbilledTotalUsd)}</td>
                   <td>
                     <button type="button" className="nj2-btn nj2-btn-brand nj2-btn-sm" disabled={busy}
-                      onClick={() => call("/api/admin/invoices", { organizationId: c.id }, `Invoice created for ${c.name}.`)}>
+                      onClick={() => { if (confirm(`Generate an invoice for ${c.name} — ${c.unbilledCount} order(s), ${usd(c.unbilledTotalUsd)}?`)) call("/api/admin/invoices", { organizationId: c.id }, `Invoice created for ${c.name}.`); }}>
                       Generate invoice
                     </button>
                   </td>
@@ -77,7 +77,7 @@ export function BillingConsole({ companies, invoices }: { companies: CompanyRow[
                   <td>{usd(i.totalUsd)}</td>
                   <td><span className="rd-badge rd-badge-accent">{i.status}</span></td>
                   <td style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-                    <a href={`/api/invoices/${i.id}/pdf`} target="_blank" rel="noreferrer" className="rd-auth-link" style={{ fontSize: 13 }}>PDF</a>
+                    <a href={`/api/invoices/${i.id}/pdf`} target="_blank" rel="noreferrer" className="rd-linkbtn" style={{ fontSize: 13, textDecoration: "none" }}>PDF</a>
                     {i.status === "DRAFT" && (
                       <button type="button" disabled={busy} className="rd-linkbtn"
                         onClick={() => call(`/api/admin/invoices/${i.id}/status`, { status: "SENT" }, `${i.number} sent.`)}>Send</button>

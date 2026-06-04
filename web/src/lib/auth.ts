@@ -27,7 +27,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!credentials?.email || !credentials?.password) return null;
 
         const user = await prisma.user.findUnique({
-          where: { email: credentials.email as string },
+          where: { email: (credentials.email as string).trim().toLowerCase() },
         });
 
         if (!user) return null;
@@ -52,14 +52,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
   callbacks: {
     async jwt({ token, user }) {
-      if (user) {
-        // First sign-in: embed role from DB
+      if (user) token.id = user.id;
+      // Re-read role from the DB on every call so role changes (promotions AND demotions)
+      // take effect immediately instead of waiting for the JWT to expire.
+      if (token.id) {
         const dbUser = await prisma.user.findUnique({
-          where: { id: user.id },
+          where: { id: token.id as string },
           select: { role: true },
         });
         token.role = dbUser?.role ?? "CUSTOMER";
-        token.id = user.id;
       }
       return token;
     },

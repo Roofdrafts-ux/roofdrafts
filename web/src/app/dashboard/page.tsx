@@ -64,6 +64,7 @@ export default async function DashboardPage() {
                 Billing
               </Link>
             )}
+            <Link href="/dashboard/account" className="rd-dash-user" style={{ textDecoration: "none" }}>Account</Link>
             <span className="rd-dash-user">{session.user.name ?? session.user.email}</span>
             <SignOutButton />
           </div>
@@ -134,16 +135,17 @@ export default async function DashboardPage() {
                     )}
                     {o.status === "DELIVERED" && o.deliverables.length > 0 ? (
                       <div className="rd-order-files">
-                        {o.deliverables.map((d) => (
-                          <a
-                            key={d.id}
-                            href={d.url ?? "#"}
-                            className="rd-file-btn"
-                            aria-disabled={!d.url}
-                          >
-                            {d.type === "XACTIMATE_ESX" ? "ESX" : d.type}
-                          </a>
-                        ))}
+                        {o.deliverables.map((d) =>
+                          d.url ? (
+                            <a key={d.id} href={d.url} className="rd-file-btn">
+                              {d.type === "XACTIMATE_ESX" ? "ESX" : d.type}
+                            </a>
+                          ) : (
+                            <span key={d.id} className="rd-file-btn" style={{ opacity: 0.5, cursor: "default" }}>
+                              {d.type === "XACTIMATE_ESX" ? "ESX" : d.type}
+                            </span>
+                          )
+                        )}
                       </div>
                     ) : (
                       <span className="rd-order-eta">

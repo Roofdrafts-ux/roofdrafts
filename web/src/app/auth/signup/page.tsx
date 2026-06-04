@@ -56,7 +56,12 @@ export default function SignUpPage() {
     const data = await res.json().catch(() => ({} as { bookingUrl?: string }));
 
     // Sign in (no auto-redirect) so we can route company leads to a booking step.
-    await signIn("credentials", { email, password, redirect: false });
+    const signInRes = await signIn("credentials", { email, password, redirect: false });
+    if (signInRes?.error) {
+      // Account created but auto sign-in failed — send them to sign in explicitly.
+      router.push("/auth/signin");
+      return;
+    }
 
     const callbackUrl =
       new URLSearchParams(window.location.search).get("callbackUrl") || "/go";
@@ -191,6 +196,7 @@ export default function SignUpPage() {
                 <span className="rd-field-label">Company name</span>
                 <input
                   type="text"
+                  required
                   autoComplete="organization"
                   value={companyName}
                   onChange={(e) => setCompanyName(e.target.value)}

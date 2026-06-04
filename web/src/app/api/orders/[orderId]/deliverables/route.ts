@@ -39,6 +39,20 @@ export async function POST(
       { status: 422 }
     );
   }
+  // Mirror the delivery guardrail: never build a real deliverable set from an unverified
+  // AI draft or mock imagery.
+  if (order.roofModel.aiDrafted) {
+    return NextResponse.json(
+      { error: "This roof model is an unverified AI draft — verify it before generating deliverables." },
+      { status: 422 }
+    );
+  }
+  if (order.roofModel.isMock) {
+    return NextResponse.json(
+      { error: "This roof model is traced over mock imagery and cannot produce real deliverables." },
+      { status: 422 }
+    );
+  }
 
   // Reset + recreate the deliverable index for this order.
   await prisma.deliverable.deleteMany({ where: { orderId } });

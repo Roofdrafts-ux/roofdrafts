@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { name, email, password, accountType, companyName, monthlyVolume } = body as {
+    const { name, email: emailRaw, password, accountType, companyName, monthlyVolume } = body as {
       name?: string;
       email?: string;
       password?: string;
@@ -62,6 +62,9 @@ export async function POST(req: NextRequest) {
       companyName?: string;
       monthlyVolume?: string;
     };
+
+    // Normalize email so casing can't create duplicate/confusable accounts.
+    const email = (emailRaw ?? "").trim().toLowerCase();
 
     // Normalize self-reported segmentation (never trusted for authz — display/routing only).
     const acct = accountType && ACCOUNT_TYPES.has(accountType) ? accountType : null;

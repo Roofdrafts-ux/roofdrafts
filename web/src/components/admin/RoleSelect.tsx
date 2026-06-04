@@ -21,6 +21,10 @@ export function RoleSelect({
 
   async function change(next: Role) {
     const prev = value;
+    if ((next === "ADMIN" || prev === "ADMIN") &&
+        !confirm(`Change this user's role from ${prev} to ${next}? Admins can access everything.`)) {
+      return;
+    }
     setValue(next);
     setBusy(true);
     setErr("");

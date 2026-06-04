@@ -56,13 +56,14 @@ export async function POST(req: NextRequest) {
   });
   if (existingMember) return NextResponse.json({ error: "That person is already a member." }, { status: 409 });
 
+  // Supersede any prior pending invite for this email in this org, then create a fresh one.
+  await prisma.invitation.updateMany({
+    where: { organizationId: m.organizationId, email, status: "PENDING" },
+    data: { status: "REVOKED" },
+  });
   const token = globalThis.crypto.randomUUID();
-  const invitation = await prisma.invitation.upsert({
-    where: {
-      // re-inviting the same email refreshes the pending invite
-      token,
-    },
-    create: {
+  const invitation = await prisma.invitation.create({
+    data: {
       organizationId: m.organizationId,
       email,
       role,
@@ -70,13 +71,6 @@ export async function POST(req: NextRequest) {
       invitedById: session.user.id,
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     },
-    update: {},
-  });
-
-  // Clear any older pending invite for the same email in this org.
-  await prisma.invitation.updateMany({
-    where: { organizationId: m.organizationId, email, status: "PENDING", NOT: { id: invitation.id } },
-    data: { status: "REVOKED" },
   });
 
   try {

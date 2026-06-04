@@ -65,6 +65,10 @@ export function Nav({ onOrder }: { onOrder: () => void }) {
         >
           <Icon name="phone" size={13} style={{ opacity: 0.6 }} /> (682) 325-7399
         </a>
+        <a href="/auth/signin" className="tp-navlink tp-nav-desktop">Sign in</a>
+        <a href="/auth/signup" className="nj2-btn nj2-btn-sm" style={{ background: "transparent", border: "1px solid var(--nj2-border-subtle, #d8d2c7)" }}>
+          Sign up
+        </a>
         <button className="nj2-btn tp-btn-accent nj2-btn-sm" onClick={onOrder}>
           Order a report <span style={{ opacity: 0.8 }}>→</span>
         </button>

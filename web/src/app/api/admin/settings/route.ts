@@ -6,11 +6,21 @@ import { writeAudit, ipFromHeaders } from "@/lib/audit";
 const BY_KEY = Object.fromEntries(SETTINGS.map((s) => [s.key, s]));
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
+const NUMERIC_RANGE: Record<string, [number, number]> = {
+  company_volume_discount_pct: [0, 100],
+  invoice_net_days: [0, 365],
+};
+
 function validate(key: string, value: string): string | null {
   const def = BY_KEY[key];
   if (!def) return `Unknown setting: ${key}`;
   const v = value.trim();
   if (v === "") return null; // empty clears → falls back to env/default
+  if (NUMERIC_RANGE[key]) {
+    const n = Number(v);
+    const [min, max] = NUMERIC_RANGE[key];
+    if (!Number.isFinite(n) || n < min || n > max) return `${def.label} must be a number between ${min} and ${max}`;
+  }
   if (def.type === "boolean" && v !== "true" && v !== "false") return `${def.label} must be true/false`;
   if (def.type === "url" && !/^https?:\/\//i.test(v)) return `${def.label} must be a valid URL`;
   if (def.type === "emails" && !v.split(",").map((e) => e.trim()).filter(Boolean).every((e) => EMAIL_RE.test(e)))
