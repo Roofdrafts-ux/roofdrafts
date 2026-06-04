@@ -77,7 +77,16 @@ Governing briefs: `CLAUDE-CODE-PROMPT-v2.md` + `MASTER-PLAN.md` (the original v1
 ## Admin control plane (build in progress — phased)
 Target: full B2B control plane. Tenancy model = **every customer gets an Organization** (individuals =
 org-of-one; companies = multi-member). Billing = per-report (individuals) + consolidated **invoicing**
-(companies). Phases: 1 Foundation ✓ · 2 Tenancy ✓ · 3 Billing · 4 Governance/ops.
+(companies). Phases: 1 Foundation ✓ · 2 Tenancy ✓ · 3 Billing ✓ · 4 Governance/ops.
+- **Login routing**: `/go` (server) sends each role home (ADMIN→/admin, ESTIMATOR→/estimator, else
+  /dashboard). signin/signup default `callbackUrl` = `/go`; explicit callbackUrl (invite) preserved.
+- **Billing** (`lib/billing.ts`, `Invoice` model + `Order.invoiceId`): individuals pay per-report at
+  checkout (unchanged); **companies are invoiced** — admin `/admin/billing` rolls an org's unbilled
+  orders into a DRAFT `Invoice` (volume discount + net-days from Settings), then Send/Mark-paid/Void.
+  Customer view `/dashboard/billing` (org ADMIN+); invoice PDF at `/api/invoices/[id]/pdf` (`lib/invoice-pdf`).
+  Company orders show "Billed via invoice" instead of a Pay button. Audit: invoice.create/status.
+- ⚠️ GOTCHA: two *different* dynamic slug names at one path level (`[id]` vs `[token]`) build fine
+  locally but 500 every route at runtime on Netlify. Keep one slug name per level (we hit this once).
 - **Tenancy** (`lib/org.ts`): `Organization` / `OrganizationMember` (OWNER>ADMIN>MEMBER, `orgAtLeast`) /
   `Invitation`. Every signup creates an org (`createOrgForUser`); orders carry `organizationId` and are
   listed org-scoped. Active org = `org_id` cookie → OWNER org → first (`getCurrentMembership`). Team UI

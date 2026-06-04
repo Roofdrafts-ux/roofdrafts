@@ -58,6 +58,13 @@ enum InvitationStatus {
   EXPIRED
 }
 
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  VOID
+}
+
 // ─── Models ───────────────────────────────────────────────────────────────────
 
 model User {
@@ -156,10 +163,13 @@ model Order {
 
   /// Tenant that owns this order (the customer's organization). Nullable for legacy rows.
   organizationId String?
+  /// Set when this order has been rolled into a company invoice (Phase 3 billing).
+  invoiceId      String?
 
   user             User            @relation("CustomerOrders", fields: [userId], references: [id])
   assignedEstimator User?          @relation("EstimatorOrders", fields: [assignedEstimatorId], references: [id])
   organization     Organization?   @relation(fields: [organizationId], references: [id])
+  invoice          Invoice?        @relation(fields: [invoiceId], references: [id])
   roofModel        RoofModel?
   deliverables     Deliverable[]
   consentRecords   ConsentRecord[]
@@ -283,6 +293,7 @@ model Organization {
   members     OrganizationMember[]
   invitations Invitation[]
   orders      Order[]
+  invoices    Invoice[]
 
   @@map("organizations")
 }
@@ -319,4 +330,26 @@ model Invitation {
 
   @@index([email])
   @@map("invitations")
+}
+
+/// Consolidated invoice for a company org (Phase 3 billing). Rolls up uninvoiced orders.
+model Invoice {
+  id             String        @id @default(cuid())
+  number         String        @unique
+  organizationId String
+  status         InvoiceStatus @default(DRAFT)
+  subtotalUsd    Int           @default(0)
+  discountUsd    Int           @default(0)
+  totalUsd       Int           @default(0)
+  notes          String?
+  createdAt      DateTime      @default(now())
+  sentAt         DateTime?
+  paidAt         DateTime?
+  dueAt          DateTime?
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  orders       Order[]
+
+  @@index([organizationId])
+  @@map("invoices")
 }

@@ -34,6 +34,7 @@ export default async function DashboardPage() {
   const session = await requireAuth();
   const membership = await getCurrentMembership(session.user.id);
   const canManageTeam = membership ? orgAtLeast(membership.role, "ADMIN") : false;
+  const isCompany = membership?.orgType === "COMPANY";
 
   const orders = await prisma.order.findMany({
     where: membership
@@ -56,6 +57,11 @@ export default async function DashboardPage() {
             {membership && (
               <Link href="/dashboard/team" className="rd-dash-user" style={{ textDecoration: "none" }}>
                 {membership.orgName} · Team
+              </Link>
+            )}
+            {isCompany && canManageTeam && (
+              <Link href="/dashboard/billing" className="rd-dash-user" style={{ textDecoration: "none" }}>
+                Billing
               </Link>
             )}
             <span className="rd-dash-user">{session.user.name ?? session.user.email}</span>
@@ -118,10 +124,13 @@ export default async function DashboardPage() {
                         {o.paymentStatus === "PAID" ? "Paid" : o.paymentStatus === "REFUNDED" ? "Refunded" : "Unpaid"}
                       </span>
                     </div>
-                    {o.paymentStatus === "UNPAID" && o.status !== "CANCELLED" && (
+                    {!isCompany && o.paymentStatus === "UNPAID" && o.status !== "CANCELLED" && (
                       <Link href={`/dashboard/pay/${o.id}`} className="nj2-btn nj2-btn-brand nj2-btn-sm">
                         Pay {o.priceUsd != null ? formatUsd(o.priceUsd) : ""}
                       </Link>
+                    )}
+                    {isCompany && o.paymentStatus !== "PAID" && o.status !== "CANCELLED" && (
+                      <span className="rd-order-eta">Billed via invoice</span>
                     )}
                     {o.status === "DELIVERED" && o.deliverables.length > 0 ? (
                       <div className="rd-order-files">

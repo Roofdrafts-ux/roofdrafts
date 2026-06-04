@@ -36,6 +36,7 @@ export default async function AdminUsersPage() {
             <Link href="/admin" className="rd-admin-navlink">Overview</Link>
             <Link href="/admin/users" className="rd-admin-navlink rd-admin-navlink-active">Users</Link>
             <Link href="/admin/pricing" className="rd-admin-navlink">Pricing</Link>
+            <Link href="/admin/billing" className="rd-admin-navlink">Billing</Link>
             <Link href="/admin/settings" className="rd-admin-navlink">Settings</Link>
             <Link href="/admin/audit" className="rd-admin-navlink">Audit</Link>
             <span className="rd-admin-user">{session.user.name ?? session.user.email}</span>

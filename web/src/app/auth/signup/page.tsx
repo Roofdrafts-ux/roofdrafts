@@ -59,7 +59,7 @@ export default function SignUpPage() {
     await signIn("credentials", { email, password, redirect: false });
 
     const callbackUrl =
-      new URLSearchParams(window.location.search).get("callbackUrl") || "/dashboard";
+      new URLSearchParams(window.location.search).get("callbackUrl") || "/go";
 
     if (isCompany) {
       setBookingUrl(data.bookingUrl ?? "");
@@ -72,7 +72,7 @@ export default function SignUpPage() {
 
   async function handleGoogle() {
     const callbackUrl =
-      new URLSearchParams(window.location.search).get("callbackUrl") || "/dashboard";
+      new URLSearchParams(window.location.search).get("callbackUrl") || "/go";
     await signIn("google", { callbackUrl });
   }
 

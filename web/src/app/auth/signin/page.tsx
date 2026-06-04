@@ -16,7 +16,9 @@ export default function SignInPage() {
 function SignInForm() {
   const router = useRouter();
   const params = useSearchParams();
-  const callbackUrl = params.get("callbackUrl") ?? "/dashboard";
+  // Default to /go, which routes each role to its console (staff → /admin|/estimator,
+  // customers → /dashboard). An explicit callbackUrl (e.g. invite flow) is preserved.
+  const callbackUrl = params.get("callbackUrl") ?? "/go";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
