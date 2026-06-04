@@ -3,15 +3,12 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { writeAudit, ipFromHeaders } from "@/lib/audit";
 
-/** POST /api/org/invitations/:token/accept — the invited user joins the org. */
-export async function POST(
-  req: NextRequest,
-  { params }: { params: Promise<{ token: string }> }
-) {
+/** POST /api/org/invitations/accept  body: { token } — the invited user joins the org. */
+export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session?.user) return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
 
-  const { token } = await params;
+  const token = String((await req.json().catch(() => ({})))?.token ?? "");
   const invite = await prisma.invitation.findUnique({ where: { token } });
   if (!invite || invite.status !== "PENDING") {
     return NextResponse.json({ error: "This invitation is no longer valid." }, { status: 410 });

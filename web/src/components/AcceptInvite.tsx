@@ -11,7 +11,11 @@ export function AcceptInvite({ token }: { token: string }) {
   async function accept() {
     setBusy(true);
     setErr("");
-    const res = await fetch(`/api/org/invitations/${token}/accept`, { method: "POST" });
+    const res = await fetch(`/api/org/invitations/accept`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token }),
+    });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
       setErr(data.error ?? "Could not accept the invitation.");
