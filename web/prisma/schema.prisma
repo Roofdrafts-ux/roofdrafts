@@ -65,6 +65,14 @@ enum InvoiceStatus {
   VOID
 }
 
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  CONVERTED
+  LOST
+}
+
 // ─── Models ───────────────────────────────────────────────────────────────────
 
 model User {
@@ -80,6 +88,10 @@ model User {
   companyName    String?
   /// Self-reported monthly report volume: "1-5" | "5-20" | "20+".
   monthlyVolume  String?
+  /// Sales-lead pipeline stage (company accounts). null = not a tracked lead.
+  leadStatus     LeadStatus?
+  leadNotes      String?
+  leadStatusAt   DateTime?
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 

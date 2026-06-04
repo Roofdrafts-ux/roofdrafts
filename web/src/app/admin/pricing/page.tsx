@@ -29,6 +29,8 @@ export default async function AdminPricingPage() {
           </Link>
           <nav className="rd-admin-nav">
             <Link href="/admin" className="rd-admin-navlink">Overview</Link>
+            <Link href="/admin/leads" className="rd-admin-navlink">Leads</Link>
+            <Link href="/admin/orders" className="rd-admin-navlink">Orders</Link>
             <Link href="/admin/users" className="rd-admin-navlink">Users</Link>
             <Link href="/admin/pricing" className="rd-admin-navlink rd-admin-navlink-active">Pricing</Link>
             <Link href="/admin/billing" className="rd-admin-navlink">Billing</Link>

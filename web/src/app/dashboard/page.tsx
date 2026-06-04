@@ -4,6 +4,7 @@ import { STATUS_META } from "@/lib/orders";
 import { formatUsd } from "@/lib/pricing";
 import { getCurrentMembership, orgAtLeast } from "@/lib/org";
 import { SignOutButton } from "@/components/dashboard/SignOutButton";
+import { RevisionButton } from "@/components/dashboard/RevisionButton";
 import Link from "next/link";
 import "./dashboard.css";
 import type { OrderStatus } from "@/generated/prisma/enums";
@@ -152,6 +153,7 @@ export default async function DashboardPage() {
                         {o.slaDueAt ? `ETA ${fmtDate(o.slaDueAt)}` : ""}
                       </span>
                     )}
+                    {o.status === "DELIVERED" && <RevisionButton orderId={o.id} />}
                   </div>
                 </div>
               );

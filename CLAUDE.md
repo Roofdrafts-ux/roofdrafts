@@ -109,6 +109,17 @@ org-of-one; companies = multi-member). Billing = per-report (individuals) + cons
   privileged actions. Already hooked: `user.signup`, `user.role.update`, `setting.update`. Add a
   `writeAudit(...)` call to every new privileged mutation.
 
+## ROI ops (Phase 5 — built, may be pre-deploy)
+Researched roofing-ops best practices (speed-to-lead, simple pipeline, central visibility).
+- **Lead pipeline** (`User.leadStatus` NEW/CONTACTED/QUALIFIED/CONVERTED/LOST + leadNotes): company
+  signups become NEW leads; admin `/admin/leads` (`LeadsBoard`) with stage + notes; `/api/admin/leads/[userId]`.
+- **Work management**: admin `/admin/orders` (all orders + per-estimator workload) with estimator
+  **assignment** (`AssignSelect`, `/api/admin/orders/[orderId]/assign`). Estimator self-claim is race-safe.
+- **Customer revisions**: `RevisionButton` on delivered orders → `/api/orders/[orderId]/revision`
+  (owner/org-member, DELIVERED→REVISION_REQUESTED, alerts team).
+- **Shared `AdminNav`** (`components/admin/AdminNav.tsx`): single source for admin nav — add links there.
+  Nav: Overview·Leads·Orders·Users·Pricing·Billing·Settings·Audit.
+
 ## Status
 Phases 1–5 complete (marketing, geometry+measure tool, auth/RBAC/Stripe/consent/dashboard, estimator
 console + deliverables, admin + pricing/coverage + tests) plus payment + transactional email + live

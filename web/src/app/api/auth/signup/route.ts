@@ -104,6 +104,8 @@ export async function POST(req: NextRequest) {
         accountType: acct,
         companyName: company,
         monthlyVolume: volume,
+        leadStatus: isCompany ? "NEW" : null,
+        leadStatusAt: isCompany ? new Date() : null,
         accounts: {
           create: {
             type: "credentials",
