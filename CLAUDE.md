@@ -77,7 +77,13 @@ Governing briefs: `CLAUDE-CODE-PROMPT-v2.md` + `MASTER-PLAN.md` (the original v1
 ## Admin control plane (build in progress — phased)
 Target: full B2B control plane. Tenancy model = **every customer gets an Organization** (individuals =
 org-of-one; companies = multi-member). Billing = per-report (individuals) + consolidated **invoicing**
-(companies). Phases: 1 Foundation ✓ · 2 Tenancy (orgs/members/invites) · 3 Billing · 4 Governance/ops.
+(companies). Phases: 1 Foundation ✓ · 2 Tenancy ✓ · 3 Billing · 4 Governance/ops.
+- **Tenancy** (`lib/org.ts`): `Organization` / `OrganizationMember` (OWNER>ADMIN>MEMBER, `orgAtLeast`) /
+  `Invitation`. Every signup creates an org (`createOrgForUser`); orders carry `organizationId` and are
+  listed org-scoped. Active org = `org_id` cookie → OWNER org → first (`getCurrentMembership`). Team UI
+  at `/dashboard/team`; invite→email→`/invite/[token]` accept (email must match); last-owner protection;
+  `/api/org/{invitations,members,switch}`. `/invite` is in the proxy PUBLIC list. Audit: member.invite,
+  invite.accept/revoke, member.role.update, member.remove.
 - **Settings** (`lib/settings.ts`, `Setting` table, `/admin/settings`): owner-editable business config,
   resolves DB → env → default. Registry = `SETTINGS[]`. NEVER store secrets here (env only).
   Wired: `lead_alert_emails` (company-signup alerts), `order_emails_enabled` (notify.ts gate),

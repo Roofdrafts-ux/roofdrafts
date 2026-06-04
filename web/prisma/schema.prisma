@@ -40,6 +40,24 @@ enum PaymentStatus {
   REFUNDED
 }
 
+enum OrgType {
+  INDIVIDUAL
+  COMPANY
+}
+
+enum OrgRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  REVOKED
+  EXPIRED
+}
+
 // ─── Models ───────────────────────────────────────────────────────────────────
 
 model User {
@@ -63,9 +81,10 @@ model User {
   sessions       Session[]
 
   // App relations
-  orders         Order[]         @relation("CustomerOrders")
-  assignedOrders Order[]         @relation("EstimatorOrders")
+  orders         Order[]              @relation("CustomerOrders")
+  assignedOrders Order[]              @relation("EstimatorOrders")
   consentRecords ConsentRecord[]
+  memberships    OrganizationMember[]
 
   @@map("users")
 }
@@ -135,8 +154,12 @@ model Order {
   assignedEstimatorId String?
   claimedAt           DateTime?
 
+  /// Tenant that owns this order (the customer's organization). Nullable for legacy rows.
+  organizationId String?
+
   user             User            @relation("CustomerOrders", fields: [userId], references: [id])
   assignedEstimator User?          @relation("EstimatorOrders", fields: [assignedEstimatorId], references: [id])
+  organization     Organization?   @relation(fields: [organizationId], references: [id])
   roofModel        RoofModel?
   deliverables     Deliverable[]
   consentRecords   ConsentRecord[]
@@ -247,4 +270,53 @@ model AuditLog {
   @@index([createdAt])
   @@index([action])
   @@map("audit_logs")
+}
+
+/// Tenant. Every customer has one (individuals = org-of-one; companies = multi-member).
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  type      OrgType  @default(INDIVIDUAL)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt @default(now())
+
+  members     OrganizationMember[]
+  invitations Invitation[]
+  orders      Order[]
+
+  @@map("organizations")
+}
+
+/// User ↔ Organization with a tenant-scoped role.
+model OrganizationMember {
+  id             String   @id @default(cuid())
+  organizationId String
+  userId         String
+  role           OrgRole  @default(MEMBER)
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+  @@index([userId])
+  @@map("organization_members")
+}
+
+/// Pending invite for someone to join an organization at a given role.
+model Invitation {
+  id             String           @id @default(cuid())
+  organizationId String
+  email          String
+  role           OrgRole          @default(MEMBER)
+  token          String           @unique
+  status         InvitationStatus @default(PENDING)
+  invitedById    String?
+  createdAt      DateTime         @default(now())
+  expiresAt      DateTime?
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([email])
+  @@map("invitations")
 }

@@ -23,7 +23,7 @@ export const authConfig: NextAuthConfig = {
       // (401/403), not an HTML redirect — let them through the proxy.
       if (pathname.startsWith("/api")) return true;
 
-      const PUBLIC = ["/", "/auth", "/legal", "/pricing", "/how-it-works", "/unauthorized"];
+      const PUBLIC = ["/", "/auth", "/legal", "/pricing", "/how-it-works", "/unauthorized", "/invite"];
       const isPublic = PUBLIC.some((p) => pathname.startsWith(p)) ||
         pathname.startsWith("/_next") || pathname.startsWith("/favicon");
 

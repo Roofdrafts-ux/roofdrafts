@@ -58,17 +58,22 @@ export default function SignUpPage() {
     // Sign in (no auto-redirect) so we can route company leads to a booking step.
     await signIn("credentials", { email, password, redirect: false });
 
+    const callbackUrl =
+      new URLSearchParams(window.location.search).get("callbackUrl") || "/dashboard";
+
     if (isCompany) {
       setBookingUrl(data.bookingUrl ?? "");
       setBookingLead(true);
       setLoading(false);
     } else {
-      router.push("/dashboard");
+      router.push(callbackUrl);
     }
   }
 
   async function handleGoogle() {
-    await signIn("google", { callbackUrl: "/dashboard" });
+    const callbackUrl =
+      new URLSearchParams(window.location.search).get("callbackUrl") || "/dashboard";
+    await signIn("google", { callbackUrl });
   }
 
   // ── Post-signup booking step for company leads ──

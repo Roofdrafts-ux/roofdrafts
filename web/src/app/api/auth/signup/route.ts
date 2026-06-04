@@ -5,6 +5,7 @@ import { rateLimit, clientIp } from "@/lib/rate-limit";
 import { getEmailer } from "@/lib/email";
 import { getEmails, getSetting } from "@/lib/settings";
 import { writeAudit } from "@/lib/audit";
+import { createOrgForUser } from "@/lib/org";
 
 const ACCOUNT_TYPES = new Set(["individual", "company"]);
 const VOLUMES = new Set(["1-5", "5-20", "20+"]);
@@ -110,6 +111,10 @@ export async function POST(req: NextRequest) {
         },
       },
     });
+
+    // Every customer gets an organization (individual = org-of-one; company = multi-member).
+    const orgName = company || name?.trim() || email.split("@")[0];
+    await createOrgForUser(user.id, orgName, isCompany ? "COMPANY" : "INDIVIDUAL");
 
     // ── Record consent (terms_v1) ─────────────────────────────────
     const ip =

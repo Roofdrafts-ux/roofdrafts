@@ -2,12 +2,14 @@ import { requireAuth } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 import { STATUS_META } from "@/lib/orders";
 import { formatUsd } from "@/lib/pricing";
+import { getCurrentMembership, orgAtLeast } from "@/lib/org";
 import { SignOutButton } from "@/components/dashboard/SignOutButton";
 import Link from "next/link";
 import "./dashboard.css";
 import type { OrderStatus } from "@/generated/prisma/enums";
 
 export const metadata = { title: "Your reports — Roofdrafts" };
+export const dynamic = "force-dynamic";
 
 const REPORT_LABEL: Record<string, string> = {
   residential: "Residential",
@@ -30,9 +32,13 @@ function fmtDate(d: Date): string {
 
 export default async function DashboardPage() {
   const session = await requireAuth();
+  const membership = await getCurrentMembership(session.user.id);
+  const canManageTeam = membership ? orgAtLeast(membership.role, "ADMIN") : false;
 
   const orders = await prisma.order.findMany({
-    where: { userId: session.user.id },
+    where: membership
+      ? { organizationId: membership.organizationId }
+      : { userId: session.user.id },
     orderBy: { createdAt: "desc" },
     include: { deliverables: true },
   });
@@ -47,6 +53,11 @@ export default async function DashboardPage() {
             <span className="rd-dash-brand-drafts">drafts</span>
           </Link>
           <div className="rd-dash-header-right">
+            {membership && (
+              <Link href="/dashboard/team" className="rd-dash-user" style={{ textDecoration: "none" }}>
+                {membership.orgName} · Team
+              </Link>
+            )}
             <span className="rd-dash-user">{session.user.name ?? session.user.email}</span>
             <SignOutButton />
           </div>

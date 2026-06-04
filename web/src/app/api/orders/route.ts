@@ -4,16 +4,20 @@ import { prisma } from "@/lib/prisma";
 import { normalizeReportType, normalizeTurnaround, computeSlaDueAt } from "@/lib/orders";
 import { getPrice } from "@/lib/pricing";
 import { notifyForOrder } from "@/lib/notify";
+import { getCurrentMembership } from "@/lib/org";
 
-/** GET /api/orders — list the signed-in user's orders (newest first). */
+/** GET /api/orders — list the active org's orders (newest first). */
 export async function GET() {
   const session = await auth();
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
   }
 
+  const membership = await getCurrentMembership(session.user.id);
   const orders = await prisma.order.findMany({
-    where: { userId: session.user.id },
+    where: membership
+      ? { organizationId: membership.organizationId }
+      : { userId: session.user.id },
     orderBy: { createdAt: "desc" },
     include: { deliverables: true },
   });
@@ -54,9 +58,12 @@ export async function POST(req: NextRequest) {
     .filter(Boolean)
     .join(", ");
 
+  const membership = await getCurrentMembership(session.user.id);
+
   const order = await prisma.order.create({
     data: {
       userId: session.user.id,
+      organizationId: membership?.organizationId ?? null,
       status: "PENDING",
       address: fullAddress,
       reportType,
