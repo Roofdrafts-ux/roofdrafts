@@ -34,6 +34,14 @@ export function computeSlaDueAt(turnaround: string, from: Date): Date {
   return new Date(from.getTime() + hours * 60 * 60 * 1000);
 }
 
+/**
+ * Customer-facing order number, e.g. RD-48213. Uniqueness is enforced by the
+ * DB constraint on displayId — callers retry on collision (P2002).
+ */
+export function makeDisplayId(rand: () => number = Math.random): string {
+  return "RD-" + Math.floor(10000 + rand() * 90000);
+}
+
 /** Human-facing status label + token color key for badges. */
 export const STATUS_META: Record<OrderStatus, { label: string; tone: string }> = {
   PENDING:            { label: "Received",          tone: "info" },

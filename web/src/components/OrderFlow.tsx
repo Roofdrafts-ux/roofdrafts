@@ -214,7 +214,8 @@ export function OrderFlow({ open, onClose }: { open: boolean; onClose: () => voi
                   : "Order a roof report"}
             </div>
             <div style={{ fontFamily: "var(--nj2-font-mono)", fontSize: 11, color: "var(--nj2-fg-3)" }}>
-              {reportId.current}
+              {/* Provisional until the server assigns the real RD number on submit. */}
+              {phase === "form" ? `${reportId.current} · draft` : reportId.current}
             </div>
           </div>
           <button

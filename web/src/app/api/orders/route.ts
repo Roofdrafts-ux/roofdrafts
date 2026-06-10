@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { normalizeReportType, normalizeTurnaround, computeSlaDueAt } from "@/lib/orders";
+import { normalizeReportType, normalizeTurnaround, computeSlaDueAt, makeDisplayId } from "@/lib/orders";
 import { getPrice } from "@/lib/pricing";
 import { notifyForOrder } from "@/lib/notify";
 import { getCurrentMembership } from "@/lib/org";
@@ -60,19 +60,29 @@ export async function POST(req: NextRequest) {
 
   const membership = await getCurrentMembership(session.user.id);
 
-  const order = await prisma.order.create({
-    data: {
-      userId: session.user.id,
-      organizationId: membership?.organizationId ?? null,
-      status: "PENDING",
-      address: fullAddress,
-      reportType,
-      turnaround: turn,
-      notes: notes?.trim() || null,
-      slaDueAt: computeSlaDueAt(turn, now),
-      priceUsd: getPrice(reportType, turn),
-    },
-  });
+  const data = {
+    userId: session.user.id,
+    organizationId: membership?.organizationId ?? null,
+    status: "PENDING" as const,
+    address: fullAddress,
+    reportType,
+    turnaround: turn,
+    notes: notes?.trim() || null,
+    slaDueAt: computeSlaDueAt(turn, now),
+    priceUsd: getPrice(reportType, turn),
+  };
+
+  // Customer-facing RD-##### number; retry the rare collision (unique
+  // constraint on displayId), then fall back to the schema default (cuid).
+  let order = null;
+  for (let attempt = 0; attempt < 3 && !order; attempt++) {
+    try {
+      order = await prisma.order.create({ data: { ...data, displayId: makeDisplayId() } });
+    } catch (e) {
+      if ((e as { code?: string }).code !== "P2002") throw e;
+    }
+  }
+  if (!order) order = await prisma.order.create({ data });
 
   // Best-effort "order received" email (never blocks the response).
   await notifyForOrder(order.id, "received");
