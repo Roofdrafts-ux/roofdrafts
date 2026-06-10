@@ -7,6 +7,7 @@ import {
   pitchLabel,
 } from "@/lib/applicad";
 import { SAMPLE_ROOF_XML } from "@/data/sample-roof";
+import { COMMERCIAL_ROOF_XML } from "@/data/sample-roof-commercial";
 
 // Ground truth: the vendor-generated PDF report for the same address
 // (13 Rivers Run Way, Oak Ridge TN) — "Total Area summary" + "Edge Length
@@ -95,6 +96,30 @@ describe("plan geometry", () => {
     expect(b.maxX - b.minX).toBeLessThan(70);
     expect(b.maxY - b.minY).toBeGreaterThan(60);
     expect(b.maxY - b.minY).toBeLessThan(100);
+  });
+});
+
+describe("commercial fixture (flat roof, Rio Rancho NM)", () => {
+  const com = parseAppliCad(COMMERCIAL_ROOF_XML);
+  const s = summarizeRoof(com);
+
+  it("parses and sums face areas (~3,873.5 sf per the export)", () => {
+    expect(com.faces.length).toBe(9);
+    expect(s.totalAreaSf).toBeCloseTo(3873.53, 0);
+  });
+
+  it("is flat with box gutters and aprons", () => {
+    expect(s.predominantPitch).toBe("flat");
+    expect(s.edgeLf["BOX-GUTTER"]).toBeGreaterThan(0);
+    expect(s.edgeLf["APRON"]).toBeGreaterThan(0);
+  });
+
+  it("chains every loop into a drawable polygon", () => {
+    for (const f of com.faces) {
+      for (const loop of f.loops) {
+        expect(loopToPolygon(loop, com).length, f.id).toBeGreaterThanOrEqual(3);
+      }
+    }
   });
 });
 

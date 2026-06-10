@@ -2,12 +2,7 @@
 // Server-safe: pure JSX, no hooks. Colors extend the paper palette used by
 // the marketing RoofPlan renderer so reports and site share one language.
 import React from "react";
-import {
-  type AppliRoof,
-  loopToPolygon,
-  planBounds,
-  EDGE_ROWS,
-} from "@/lib/applicad";
+import { type AppliRoof, loopToPolygon, EDGE_ROWS } from "@/lib/applicad";
 
 export const REPORT_LINE_STYLE: Record<
   string,
@@ -26,19 +21,40 @@ export const REPORT_LINE_STYLE: Record<
 export function RoofPlanFromXml({
   roof,
   padding = 26,
+  rotate = false,
+  showLegend = true,
+  showNorth = true,
 }: {
   roof: AppliRoof;
   padding?: number;
+  /** Rotate the plan 90° — for portrait roofs shown in landscape slots. */
+  rotate?: boolean;
+  showLegend?: boolean;
+  showNorth?: boolean;
 }) {
-  const b = planBounds(roof);
-  const wFt = b.maxX - b.minX;
-  const hFt = b.maxY - b.minY;
+  // Plan-space transform (true rotation, not a mirror): (x, y) → (y, −x).
+  const tx = (p: { x: number; y: number }) => (rotate ? p.y : p.x);
+  const ty = (p: { x: number; y: number }) => (rotate ? -p.x : p.y);
+
+  let minX = Infinity,
+    minY = Infinity,
+    maxX = -Infinity,
+    maxY = -Infinity;
+  for (const p of Object.values(roof.points)) {
+    minX = Math.min(minX, tx(p));
+    maxX = Math.max(maxX, tx(p));
+    minY = Math.min(minY, ty(p));
+    maxY = Math.max(maxY, ty(p));
+  }
+
+  const wFt = maxX - minX;
+  const hFt = maxY - minY;
   const VBW = 520;
   const drawW = VBW - padding * 2;
   const scale = drawW / wFt;
   const VBH = hFt * scale + padding * 2;
-  const px = (x: number) => padding + (x - b.minX) * scale;
-  const py = (y: number) => padding + (b.maxY - y) * scale; // plan-north up
+  const px = (u: number) => padding + (u - minX) * scale;
+  const py = (v: number) => padding + (maxY - v) * scale; // plan-north up
 
   // One path per face, all loops in it, evenodd → dormer holes punch out.
   const facePaths = roof.faces.map((f) => {
@@ -48,7 +64,12 @@ export function RoofPlanFromXml({
         if (poly.length < 3) return "";
         return (
           "M" +
-          poly.map(([x, y]) => `${px(x).toFixed(2)},${py(y).toFixed(2)}`).join("L") +
+          poly
+            .map(([x, y]) => {
+              const p = { x, y };
+              return `${px(tx(p)).toFixed(2)},${py(ty(p)).toFixed(2)}`;
+            })
+            .join("L") +
           "Z"
         );
       })
@@ -90,10 +111,10 @@ export function RoofPlanFromXml({
           return (
             <line
               key={ln.id}
-              x1={px(a.x)}
-              y1={py(a.y)}
-              x2={px(c.x)}
-              y2={py(c.y)}
+              x1={px(tx(a))}
+              y1={py(ty(a))}
+              x2={px(tx(c))}
+              y2={py(ty(c))}
               stroke={style.color}
               strokeWidth={style.width}
               strokeLinecap="round"
@@ -101,52 +122,54 @@ export function RoofPlanFromXml({
             />
           );
         })}
-        {/* north arrow */}
-        <g transform={`translate(${VBW - 20},${22})`}>
-          <circle r="11" fill="none" stroke="#7C7159" strokeOpacity="0.5" strokeWidth="0.8" />
-          <path d="M0,-6.5 L2.6,3.2 L0,1.1 L-2.6,3.2 Z" fill="#1C4A5C" />
-          <text y="-13" textAnchor="middle" fontFamily="var(--nj2-font-mono)" fontSize="8" fill="#7C7159">
-            N
-          </text>
-        </g>
+        {showNorth && !rotate && (
+          <g transform={`translate(${VBW - 20},${22})`}>
+            <circle r="11" fill="none" stroke="#7C7159" strokeOpacity="0.5" strokeWidth="0.8" />
+            <path d="M0,-6.5 L2.6,3.2 L0,1.1 L-2.6,3.2 Z" fill="#1C4A5C" />
+            <text y="-13" textAnchor="middle" fontFamily="var(--nj2-font-mono)" fontSize="8" fill="#7C7159">
+              N
+            </text>
+          </g>
+        )}
       </svg>
 
-      {/* legend */}
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "4px 14px",
-          marginTop: 12,
-          justifyContent: "center",
-        }}
-      >
-        {EDGE_ROWS.filter(([type]) => present.has(type)).map(([type, label]) => {
-          const s = REPORT_LINE_STYLE[type];
-          return (
-            <span
-              key={type}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                fontFamily: "var(--nj2-font-mono)",
-                fontSize: 10,
-                color: "#7C7159",
-              }}
-            >
+      {showLegend && (
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "4px 14px",
+            marginTop: 12,
+            justifyContent: "center",
+          }}
+        >
+          {EDGE_ROWS.filter(([type]) => present.has(type)).map(([type, label]) => {
+            const s = REPORT_LINE_STYLE[type];
+            return (
               <span
+                key={type}
                 style={{
-                  width: 14,
-                  height: 0,
-                  borderTop: `2.5px ${s.dash ? "dashed" : "solid"} ${s.color}`,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  fontFamily: "var(--nj2-font-mono)",
+                  fontSize: 10,
+                  color: "#7C7159",
                 }}
-              />
-              {label}
-            </span>
-          );
-        })}
-      </div>
+              >
+                <span
+                  style={{
+                    width: 14,
+                    height: 0,
+                    borderTop: `2.5px ${s.dash ? "dashed" : "solid"} ${s.color}`,
+                  }}
+                />
+                {label}
+              </span>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

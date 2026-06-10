@@ -6,6 +6,8 @@
 import React, { useEffect, useState } from "react";
 import { Icon, Wordmark, Eyebrow, Reveal } from "./primitives";
 import { RoofPlanHero, RoofPlanCompact } from "./RoofPlan";
+import { RoofPlanFromXml } from "./report/RoofPlanFromXml";
+import { RESIDENTIAL_ROOF, COMMERCIAL_ROOF } from "./report/sampleRoofs";
 import { computeRoof, commas, MODEL_CROSS_GABLE } from "@/lib/roofcalc";
 
 /* ───────── NAV ───────── */
@@ -712,7 +714,13 @@ export function Formats() {
                   style={{ padding: "14px 16px 4px", borderBottom: "1px solid var(--nj2-border-subtle)" }}
                 >
                   <div style={{ maxWidth: 230, margin: "0 auto" }}>
-                    <RoofPlanCompact pitch={r.pitch} variant={r.variant} />
+                    {r.variant === "residential" ? (
+                      <RoofPlanFromXml roof={RESIDENTIAL_ROOF} rotate showLegend={false} showNorth={false} padding={18} />
+                    ) : r.variant === "commercial" ? (
+                      <RoofPlanFromXml roof={COMMERCIAL_ROOF} showLegend={false} showNorth={false} padding={18} />
+                    ) : (
+                      <RoofPlanCompact pitch={r.pitch} variant={r.variant} />
+                    )}
                   </div>
                 </div>
                 <div style={{ padding: 22, display: "flex", flexDirection: "column", flex: 1 }}>

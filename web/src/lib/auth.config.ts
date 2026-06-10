@@ -4,6 +4,7 @@
  * The full auth.ts adds PrismaAdapter + providers for the API route.
  */
 import type { NextAuthConfig } from "next-auth";
+import type { Role } from "../generated/prisma/enums";
 
 export const authConfig: NextAuthConfig = {
   // Required behind a hosting proxy (Netlify/Vercel) — without it NextAuth v5
@@ -22,8 +23,8 @@ export const authConfig: NextAuthConfig = {
     // re-reads the role from the DB; this one only decodes what's in the token.
     session({ session, token }) {
       if (session.user && token) {
-        session.user.id = token.id;
-        session.user.role = token.role ?? "CUSTOMER";
+        session.user.id = token.id as string;
+        session.user.role = (token.role as Role | undefined) ?? "CUSTOMER";
       }
       return session;
     },
