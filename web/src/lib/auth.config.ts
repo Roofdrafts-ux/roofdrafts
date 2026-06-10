@@ -15,6 +15,18 @@ export const authConfig: NextAuthConfig = {
   },
   providers: [],  // providers are added in auth.ts only
   callbacks: {
+    // Edge-safe session mapping: surface id/role from the JWT so authorized()
+    // below can role-gate. Without this the proxy sees auth.user.role as
+    // undefined and treats every logged-in user as CUSTOMER (locking staff out
+    // of /admin and /estimator). auth.ts overrides this with a version that
+    // re-reads the role from the DB; this one only decodes what's in the token.
+    session({ session, token }) {
+      if (session.user && token) {
+        session.user.id = token.id;
+        session.user.role = token.role ?? "CUSTOMER";
+      }
+      return session;
+    },
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
       const pathname = nextUrl.pathname;
@@ -23,9 +35,18 @@ export const authConfig: NextAuthConfig = {
       // (401/403), not an HTML redirect — let them through the proxy.
       if (pathname.startsWith("/api")) return true;
 
-      const PUBLIC = ["/", "/auth", "/legal", "/pricing", "/how-it-works", "/unauthorized", "/invite"];
-      const isPublic = PUBLIC.some((p) => pathname.startsWith(p)) ||
-        pathname.startsWith("/_next") || pathname.startsWith("/favicon");
+      // "/" must match exactly — startsWith("/") is true for every path and
+      // would mark the whole site public. Other prefixes match on a path
+      // boundary so e.g. "/pricing-internal" doesn't ride along with "/pricing".
+      const PUBLIC = ["/auth", "/legal", "/pricing", "/how-it-works", "/unauthorized", "/invite", "/report"];
+      // Root-level metadata files (app/icon.svg, app/apple-icon.tsx, robots.ts,
+      // sitemap.ts) are fetched by browsers/crawlers without a session.
+      const PUBLIC_FILES = ["/favicon.ico", "/icon.svg", "/apple-icon.png", "/robots.txt", "/sitemap.xml"];
+      const isPublic =
+        pathname === "/" ||
+        PUBLIC.some((p) => pathname === p || pathname.startsWith(p + "/")) ||
+        PUBLIC_FILES.includes(pathname) ||
+        pathname.startsWith("/_next");
 
       if (isPublic) return true;
       if (!isLoggedIn) return false; // middleware will redirect to signIn
