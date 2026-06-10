@@ -73,6 +73,16 @@ enum LeadStatus {
   LOST
 }
 
+enum ChatThreadStatus {
+  OPEN
+  CLOSED
+}
+
+enum ChatSender {
+  VISITOR
+  TEAM
+}
+
 // ─── Models ───────────────────────────────────────────────────────────────────
 
 model User {
@@ -104,6 +114,7 @@ model User {
   assignedOrders Order[]              @relation("EstimatorOrders")
   consentRecords ConsentRecord[]
   memberships    OrganizationMember[]
+  chatThreads    ChatThread[]
 
   @@map("users")
 }
@@ -342,6 +353,54 @@ model Invitation {
 
   @@index([email])
   @@map("invitations")
+}
+
+/// Live-chat conversation started from the marketing-site widget. Guests are
+/// identified by an unguessable browser-generated visitorKey (cuid-length random
+/// id in localStorage) — knowledge of the key grants access to the thread, the
+/// same model anonymous Intercom/Crisp visitors use.
+model ChatThread {
+  id            String           @id @default(cuid())
+  visitorKey    String
+  /// Signed-in user who started the thread (null for guests).
+  userId        String?
+  /// Guest-provided contact details for follow-up when they leave the page.
+  email         String?
+  name          String?
+  status        ChatThreadStatus @default(OPEN)
+  /// Page the conversation started on (path only, no query).
+  pageUrl       String?
+  lastMessageAt DateTime         @default(now())
+  /// Messages the team hasn't opened yet (badge on the admin inbox).
+  unreadForTeam    Int @default(0)
+  /// Messages the visitor hasn't seen yet (badge on the widget launcher).
+  unreadForVisitor Int @default(0)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  user     User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  messages ChatMessage[]
+
+  @@index([visitorKey])
+  @@index([status, lastMessageAt])
+  @@map("chat_threads")
+}
+
+model ChatMessage {
+  id         String     @id @default(cuid())
+  threadId   String
+  sender     ChatSender
+  /// Team member who wrote it (sender = TEAM).
+  authorId   String?
+  /// Display name shown in the widget for team replies.
+  authorName String?
+  body       String
+  createdAt  DateTime   @default(now())
+
+  thread ChatThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  @@index([threadId, createdAt])
+  @@map("chat_messages")
 }
 
 /// Consolidated invoice for a company org (Phase 3 billing). Rolls up uninvoiced orders.

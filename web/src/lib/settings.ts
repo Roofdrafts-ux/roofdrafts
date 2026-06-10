@@ -33,6 +33,17 @@ export const SETTINGS: SettingDef[] = [
     placeholder: "sales@roofdrafts.com, you@example.com",
   },
   {
+    key: "chat_alert_emails",
+    label: "Chat-alert recipients",
+    description:
+      "Comma-separated inboxes notified when a visitor starts a live-chat conversation. Falls back to the lead-alert recipients when empty.",
+    type: "emails",
+    group: "Notifications",
+    envFallback: "CHAT_ALERT_EMAILS",
+    default: "",
+    placeholder: "support@roofdrafts.com",
+  },
+  {
     key: "order_emails_enabled",
     label: "Order lifecycle emails",
     description: "Email customers on order received / in-production / delivered.",

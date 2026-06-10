@@ -4,6 +4,7 @@ import { SignOutButton } from "@/components/dashboard/SignOutButton";
 const LINKS: { href: string; label: string; key: string }[] = [
   { href: "/admin", label: "Overview", key: "overview" },
   { href: "/admin/leads", label: "Leads", key: "leads" },
+  { href: "/admin/chat", label: "Chat", key: "chat" },
   { href: "/admin/orders", label: "Orders", key: "orders" },
   { href: "/admin/users", label: "Users", key: "users" },
   { href: "/admin/pricing", label: "Pricing", key: "pricing" },

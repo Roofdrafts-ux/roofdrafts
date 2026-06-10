@@ -7,6 +7,7 @@ import { Icon } from "./primitives";
 import { Nav, Hero, TrustBar, HowItWorks, Formats } from "./Marketing";
 import { SLA, Coverage, Testimonials, Pricing, FAQ, CTAFooter } from "./Marketing2";
 import { OrderFlow } from "./OrderFlow";
+import { ChatWidget } from "./chat/ChatWidget";
 
 export function App() {
   const [orderOpen, setOrderOpen] = useState(false);
@@ -44,14 +45,16 @@ export function App() {
 
       <OrderFlow open={orderOpen} onClose={() => setOrderOpen(false)} />
 
-      {/* floating order button */}
+      <ChatWidget />
+
+      {/* floating order button — stacked above the chat launcher */}
       <button
         onClick={openOrder}
         aria-label="Order a report"
         style={{
           position: "fixed",
           right: 22,
-          bottom: 22,
+          bottom: 90,
           zIndex: 80,
           display: "inline-flex",
           alignItems: "center",

@@ -41,6 +41,9 @@ const ICON_PATHS: Record<string, string> = {
   satellite:
     "M13 7 9 3 5 7l4 4M17 11l4 4-4 4-4-4M8 12l4 4 6-6-4-4ZM16 8l3-3M9 21a6 6 0 0 0-6-6",
   "alert-circle": "M12 8v4M12 16h.01",
+  "message-circle": "M7.9 20A9 9 0 1 0 4 16.1L2 22Z",
+  send: "M22 2 11 13M22 2l-7 20-4-9-9-4Z",
+  "chevron-down": "m6 9 6 6 6-6",
 };
 const ICON_CIRCLES: Record<string, number[][]> = {
   "map-pin": [[12, 10, 3]],
