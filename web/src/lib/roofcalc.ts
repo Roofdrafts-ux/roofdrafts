@@ -228,6 +228,52 @@ export const MODEL_GABLE: RoofModel = {
   ],
 };
 
+// COMMERCIAL FLAT — L-shaped low-slope roof. Parapet perimeter (eave),
+// dashed cricket/taper lines to internal drains (valley), RTU curbs (hip).
+export const MODEL_COMMERCIAL: RoofModel = {
+  name: "Commercial flat",
+  v: {
+    a: [0, 0, 0],
+    b: [46, 0, 0],
+    c: [46, 20, 0],
+    d: [28, 20, 0],
+    e: [28, 34, 0],
+    f: [0, 34, 0],
+    dr1: [13, 18, 0],
+    dr2: [37, 10, 0],
+    u1a: [5, 5, 0],
+    u1b: [11, 5, 0],
+    u1c: [11, 10, 0],
+    u1d: [5, 10, 0],
+    u2a: [33, 13, 0],
+    u2b: [39, 13, 0],
+    u2c: [39, 17, 0],
+    u2d: [33, 17, 0],
+  },
+  facets: [{ id: "R", verts: ["a", "b", "c", "d", "e", "f"] }],
+  edges: [
+    { type: "eave", a: "a", b: "b" },
+    { type: "eave", a: "b", b: "c" },
+    { type: "eave", a: "c", b: "d" },
+    { type: "eave", a: "d", b: "e" },
+    { type: "eave", a: "e", b: "f" },
+    { type: "eave", a: "f", b: "a" },
+    { type: "valley", a: "a", b: "dr1" },
+    { type: "valley", a: "f", b: "dr1" },
+    { type: "valley", a: "e", b: "dr1" },
+    { type: "valley", a: "b", b: "dr2" },
+    { type: "valley", a: "c", b: "dr2" },
+    { type: "hip", a: "u1a", b: "u1b" },
+    { type: "hip", a: "u1b", b: "u1c" },
+    { type: "hip", a: "u1c", b: "u1d" },
+    { type: "hip", a: "u1d", b: "u1a" },
+    { type: "hip", a: "u2a", b: "u2b" },
+    { type: "hip", a: "u2b", b: "u2c" },
+    { type: "hip", a: "u2c", b: "u2d" },
+    { type: "hip", a: "u2d", b: "u2a" },
+  ],
+};
+
 /* ---------- line-type styling (EagleView-style legend) ---------- */
 export const LINE_TYPES: LineType[] = ["ridge", "hip", "valley", "rake", "eave"];
 export const LINE_LABEL: Record<LineType, string> = {

@@ -41,12 +41,12 @@ export function Nav({ onOrder }: { onOrder: () => void }) {
     >
       <div
         style={{
-          maxWidth: "var(--tp-maxw)",
+          maxWidth: 1280,
           margin: "0 auto",
           padding: "14px 28px",
           display: "flex",
           alignItems: "center",
-          gap: 28,
+          gap: 12,
         }}
       >
         <Wordmark size={42} />
@@ -60,13 +60,13 @@ export function Nav({ onOrder }: { onOrder: () => void }) {
         <div style={{ flex: 1 }} />
         <a
           href="tel:+16823257399"
-          className="tp-navlink tp-nav-desktop"
+          className="tp-navlink tp-nav-phone"
           style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
         >
           <Icon name="phone" size={13} style={{ opacity: 0.6 }} /> (682) 325-7399
         </a>
-        <a href="/auth/signin" className="tp-navlink tp-nav-desktop">Sign in</a>
-        <a href="/auth/signup" className="nj2-btn nj2-btn-sm" style={{ background: "transparent", border: "1px solid var(--nj2-border-subtle, #d8d2c7)" }}>
+        <a href="/auth/signin" className="tp-navlink tp-nav-auth">Sign in</a>
+        <a href="/auth/signup" className="nj2-btn nj2-btn-sm tp-nav-auth" style={{ background: "transparent", border: "1px solid var(--nj2-border-subtle, #d8d2c7)" }}>
           Sign up
         </a>
         <button className="nj2-btn tp-btn-accent nj2-btn-sm" onClick={onOrder}>
@@ -653,6 +653,7 @@ export function Formats() {
       tag: "Residential",
       icon: "house",
       pitch: "6/12",
+      variant: "residential" as const,
       t: "Residential roof report",
       desc: "Single-family and multi-family homes. Area, squares, pitch, and every ridge, hip and valley — with waste tables.",
       items: ["Pitch & squares", "Waste calc 0–22%", "Material order ready"],
@@ -661,6 +662,7 @@ export function Formats() {
       tag: "Commercial",
       icon: "building-2",
       pitch: "Low-slope",
+      variant: "commercial" as const,
       t: "Commercial roof report",
       desc: "Warehouses, retail, flat and low-slope. Parapets, drains, penetrations and accurate perimeter linework.",
       items: ["Perimeter & area", "Penetration counts", "Up to 50 buildings"],
@@ -669,6 +671,7 @@ export function Formats() {
       tag: "3D / ESX",
       icon: "box",
       pitch: "Wall ESX",
+      variant: "wall3d" as const,
       t: "3D ESX wall diagram",
       desc: "Full 3D model with wall elevations exported as an Xactimate-ready ESX — siding, gutters and more, in one sketch.",
       items: ["Walls + roof", "Native .ESX", "Drag into Xactimate"],
@@ -709,7 +712,7 @@ export function Formats() {
                   style={{ padding: "14px 16px 4px", borderBottom: "1px solid var(--nj2-border-subtle)" }}
                 >
                   <div style={{ maxWidth: 230, margin: "0 auto" }}>
-                    <RoofPlanCompact pitch={r.pitch} />
+                    <RoofPlanCompact pitch={r.pitch} variant={r.variant} />
                   </div>
                 </div>
                 <div style={{ padding: 22, display: "flex", flexDirection: "column", flex: 1 }}>

@@ -327,7 +327,8 @@ a { color: inherit; text-decoration: none; }
 
 /* ───── nav link ───── */
 .tp-navlink { color: var(--nj2-fg-2); font-size: 14px; font-weight: 500; letter-spacing: -.005em;
-  padding: 6px 10px; border-radius: 7px; cursor: pointer; transition: background .15s, color .15s; }
+  padding: 6px 10px; border-radius: 7px; cursor: pointer; transition: background .15s, color .15s;
+  white-space: nowrap; }
 .tp-navlink:hover { color: var(--nj2-fg-1); background: var(--nj2-bg-muted); }
 
 /* ───── input ───── */
@@ -374,6 +375,15 @@ textarea.tp-input { height: auto; padding: 12px 14px; resize: vertical; line-hei
 /* ================================================================
    RESPONSIVE — collapses for the marketing grids (from index.html)
    ================================================================ */
+@media (max-width: 1220px) {
+  .tp-nav-phone { display: none !important; }
+}
+@media (max-width: 1080px) {
+  .tp-nav-desktop { display: none !important; }
+}
+@media (max-width: 640px) {
+  .tp-nav-auth { display: none !important; }
+}
 @media (max-width: 960px) {
   .tp-nav-desktop { display: none !important; }
   .tp-how-grid, .tp-fmt-grid, .tp-quote-grid, .tp-price-grid { grid-template-columns: 1fr 1fr !important; }

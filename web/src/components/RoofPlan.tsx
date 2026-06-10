@@ -14,6 +14,7 @@ import {
   LINE_DASH,
   MODEL_CROSS_GABLE,
   MODEL_GABLE,
+  MODEL_COMMERCIAL,
   type RoofModel,
   type LineType,
 } from "@/lib/roofcalc";
@@ -269,19 +270,89 @@ export function RoofPlanHero({ animate = true }: { animate?: boolean }) {
   );
 }
 
+/* 3D ESX wall diagram — isometric walls + roof wireframe (paper palette) */
+export function WallDiagram3D() {
+  const pal = LINE_PALETTE.paper;
+  // 36×24 ft footprint, 10 ft walls, 17 ft ridge, projected to isometric
+  const wall = pal.label;
+  return (
+    <svg
+      viewBox="16 84 368 268"
+      width="100%"
+      style={{ display: "block", overflow: "visible" }}
+      role="img"
+      aria-label="3D wall and roof wireframe diagram"
+    >
+      {/* roof + front wall plane fills */}
+      <polygon points="165,270 352,176 290,103 103,197" fill={pal.facet} />
+      <polygon points="165,330 352,236 352,176 165,270" fill={pal.facet} />
+      <polygon points="165,330 165,270 40,208 40,268" fill={pal.facet} />
+      {/* hidden base edges */}
+      <g stroke={wall} strokeWidth="1.2" strokeDasharray="4 3" opacity="0.3">
+        <line x1="352" y1="236" x2="227" y2="174" />
+        <line x1="227" y1="174" x2="40" y2="268" />
+        <line x1="227" y1="174" x2="227" y2="114" />
+      </g>
+      {/* siding courses on front wall */}
+      <g stroke={wall} strokeWidth="1" opacity="0.18">
+        <line x1="165" y1="318" x2="352" y2="224" />
+        <line x1="165" y1="306" x2="352" y2="212" />
+        <line x1="165" y1="294" x2="352" y2="200" />
+        <line x1="165" y1="282" x2="352" y2="188" />
+      </g>
+      {/* walls — verticals + visible base + top plates */}
+      <g stroke={wall} strokeWidth="1.5" strokeLinecap="round" fill="none">
+        <line x1="165" y1="330" x2="165" y2="270" />
+        <line x1="352" y1="236" x2="352" y2="176" />
+        <line x1="40" y1="268" x2="40" y2="208" />
+        <line x1="165" y1="330" x2="352" y2="236" />
+        <line x1="165" y1="330" x2="40" y2="268" />
+      </g>
+      {/* eaves */}
+      <g stroke={pal.eave} strokeWidth="2.2" strokeLinecap="round">
+        <line x1="165" y1="270" x2="352" y2="176" />
+        <line x1="40" y1="208" x2="227" y2="114" />
+      </g>
+      {/* rakes — gable ends */}
+      <g stroke={pal.rake} strokeWidth="1.7" strokeLinecap="round">
+        <line x1="165" y1="270" x2="103" y2="197" />
+        <line x1="103" y1="197" x2="40" y2="208" />
+        <line x1="352" y1="176" x2="290" y2="103" />
+        <line x1="290" y1="103" x2="227" y2="114" />
+      </g>
+      {/* ridge */}
+      <line x1="103" y1="197" x2="290" y2="103" stroke={pal.ridge} strokeWidth="2.4" strokeLinecap="round" />
+      {/* wall-height dimension */}
+      <g stroke={pal.dim} strokeWidth="0.7">
+        <line x1="26" y1="208" x2="26" y2="268" />
+        <line x1="22" y1="208" x2="30" y2="208" />
+        <line x1="22" y1="268" x2="30" y2="268" />
+      </g>
+      <g transform="translate(19,238) rotate(-90)">
+        <text textAnchor="middle" fontFamily="var(--nj2-font-mono)" fontSize="9.5" fontWeight="500" fill={pal.dim}>
+          10′ 0″
+        </text>
+      </g>
+    </svg>
+  );
+}
+
 export function RoofPlanCompact({
   animate = false,
   mode = "paper",
   showLegend = false,
+  variant = "residential",
 }: {
   pitch?: string;
   animate?: boolean | string;
   mode?: "paper" | "blueprint";
   showLegend?: boolean;
+  variant?: "residential" | "commercial" | "wall3d";
 }) {
+  if (variant === "wall3d") return <WallDiagram3D />;
   return (
     <RoofPlanReport
-      model={MODEL_GABLE}
+      model={variant === "commercial" ? MODEL_COMMERCIAL : MODEL_GABLE}
       mode={mode}
       animate={!!animate}
       showLegend={showLegend}
