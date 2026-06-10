@@ -3,6 +3,8 @@
 // Roofdrafts — live chat widget (launcher + panel, Intercom-style)
 // Guests get a random visitorKey in localStorage; signed-in users are
 // linked server-side via their session cookie. Polling, no websockets.
+// The key is sent via the X-Visitor-Key header (it's a bearer credential —
+// keep it out of URLs/access logs).
 // ════════════════════════════════════════════════════════════════
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Icon, Wordmark } from "../primitives";
@@ -29,12 +31,29 @@ interface Message {
   createdAt: string;
 }
 
+/** Storage can be unavailable (private mode, blocked cookies) — never throw. */
+function storageGet(key: string): string | null {
+  try {
+    return typeof window === "undefined" ? null : localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+function storageSet(key: string, value: string): void {
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    /* in-memory fallback below keeps the session working */
+  }
+}
+
+let memoryKey: string | null = null; // fallback when localStorage is blocked
 function getVisitorKey(create: boolean): string | null {
-  if (typeof window === "undefined") return null;
-  let k = localStorage.getItem(KEY_STORAGE);
+  let k = storageGet(KEY_STORAGE) ?? memoryKey;
   if (!k && create) {
     k = crypto.randomUUID().replace(/-/g, "");
-    localStorage.setItem(KEY_STORAGE, k);
+    memoryKey = k;
+    storageSet(KEY_STORAGE, k);
   }
   return k;
 }
@@ -47,6 +66,14 @@ function timeLabel(iso: string): string {
     : d.toLocaleDateString([], { month: "short", day: "numeric" });
 }
 
+/** Append a poll page, deduping by id (cursor overlap is expected). */
+function mergeMessages(prev: Message[], page: Message[]): Message[] {
+  if (page.length === 0) return prev;
+  const seen = new Set(prev.map((m) => m.id));
+  const fresh = page.filter((m) => !seen.has(m.id));
+  return fresh.length === 0 ? prev : [...prev, ...fresh];
+}
+
 type View = "home" | "list" | "thread";
 
 export function ChatWidget() {
@@ -57,12 +84,15 @@ export function ChatWidget() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [draft, setDraft] = useState("");
   const [email, setEmail] = useState("");
+  const [showEmailField, setShowEmailField] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [unread, setUnread] = useState(0);
 
   const msgsRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  // Guards against a slow response for thread A painting under thread B.
+  const activeThreadRef = useRef<string | null>(null);
 
   const scrollToEnd = () => {
     requestAnimationFrame(() => {
@@ -70,11 +100,16 @@ export function ChatWidget() {
     });
   };
 
+  const keyHeaders = (): HeadersInit => {
+    const key = getVisitorKey(false);
+    return key ? { "X-Visitor-Key": key } : {};
+  };
+
   const loadThreads = useCallback(async (): Promise<ThreadSummary[]> => {
     const key = getVisitorKey(false);
     if (!key) return [];
     try {
-      const res = await fetch(`/api/chat/threads?visitorKey=${encodeURIComponent(key)}`);
+      const res = await fetch("/api/chat/threads", { headers: { "X-Visitor-Key": key } });
       if (!res.ok) return [];
       const data = (await res.json()) as { threads: ThreadSummary[] };
       setThreads(data.threads);
@@ -85,38 +120,51 @@ export function ChatWidget() {
     }
   }, []);
 
-  const loadMessages = useCallback(async (id: string) => {
-    const key = getVisitorKey(false);
-    if (!key) return;
+  /** Incremental poll: only fetch messages newer than the last one we have. */
+  const loadMessages = useCallback(async (id: string, current: Message[]) => {
     try {
-      const res = await fetch(
-        `/api/chat/threads/${id}/messages?visitorKey=${encodeURIComponent(key)}`
-      );
+      const last = current[current.length - 1];
+      const qs = last ? `?after=${encodeURIComponent(last.createdAt)}` : "";
+      const res = await fetch(`/api/chat/threads/${id}/messages${qs}`, { headers: keyHeaders() });
       if (!res.ok) return;
       const data = (await res.json()) as { messages: Message[] };
-      setMessages((prev) => {
-        if (prev.length !== data.messages.length) scrollToEnd();
-        return data.messages;
-      });
+      if (activeThreadRef.current !== id) return; // user switched threads mid-flight
+      setMessages((prev) => mergeMessages(prev, data.messages));
+      if (data.messages.length > 0) scrollToEnd();
     } catch {
       /* transient poll failure — keep what we have */
     }
   }, []);
 
+  // Track messages in a ref so the poll interval reads fresh state without
+  // re-arming on every message.
+  const messagesRef = useRef<Message[]>(messages);
+  messagesRef.current = messages;
+
   // Unread badge poll while the panel is closed (only for returning chatters).
   useEffect(() => {
     if (open || !getVisitorKey(false)) return;
     loadThreads();
-    const t = setInterval(loadThreads, POLL_BADGE_MS);
+    const t = setInterval(() => {
+      if (document.visibilityState === "hidden") return;
+      loadThreads();
+    }, POLL_BADGE_MS);
     return () => clearInterval(t);
   }, [open, loadThreads]);
 
   // Live message poll while a conversation is on screen.
   useEffect(() => {
     if (!open || view !== "thread" || !threadId) return;
-    loadMessages(threadId);
-    const t = setInterval(() => loadMessages(threadId), POLL_THREAD_MS);
-    return () => clearInterval(t);
+    activeThreadRef.current = threadId;
+    loadMessages(threadId, messagesRef.current);
+    const t = setInterval(() => {
+      if (document.visibilityState === "hidden") return;
+      loadMessages(threadId, messagesRef.current);
+    }, POLL_THREAD_MS);
+    return () => {
+      clearInterval(t);
+      activeThreadRef.current = null;
+    };
   }, [open, view, threadId, loadMessages]);
 
   // Escape closes the panel.
@@ -132,7 +180,7 @@ export function ChatWidget() {
     setView("home");
     setError(null);
     loadThreads();
-    setEmail(localStorage.getItem(EMAIL_STORAGE) ?? "");
+    setEmail(storageGet(EMAIL_STORAGE) ?? "");
   };
 
   const openThread = (id: string | null) => {
@@ -140,7 +188,9 @@ export function ChatWidget() {
     setMessages([]);
     setView("thread");
     setError(null);
-    if (id) loadMessages(id);
+    // New conversations always offer the (prefilled) contact field so a
+    // mistyped email can be corrected; existing threads hide it.
+    setShowEmailField(id === null);
     setTimeout(() => inputRef.current?.focus(), 60);
   };
 
@@ -156,8 +206,8 @@ export function ChatWidget() {
     if (!text || sending) return;
     setSending(true);
     setError(null);
-    const key = getVisitorKey(true)!;
     try {
+      const key = getVisitorKey(true)!;
       let res: Response;
       if (threadId) {
         res = await fetch(`/api/chat/threads/${threadId}/messages`, {
@@ -182,14 +232,16 @@ export function ChatWidget() {
         setError((data as { error?: string }).error ?? "Couldn't send — please try again.");
         return;
       }
-      if (email.trim()) localStorage.setItem(EMAIL_STORAGE, email.trim());
+      if (email.trim()) storageSet(EMAIL_STORAGE, email.trim());
       setDraft("");
       if (!threadId) {
         const t = (data as { thread: { id: string } }).thread;
+        setShowEmailField(false);
+        activeThreadRef.current = t.id;
         setThreadId(t.id);
-        await loadMessages(t.id);
+        await loadMessages(t.id, []);
       } else {
-        await loadMessages(threadId);
+        await loadMessages(threadId, messagesRef.current);
       }
       scrollToEnd();
     } catch {
@@ -206,8 +258,6 @@ export function ChatWidget() {
       send();
     }
   };
-
-  const showEmailField = !threadId && !localStorage_get(EMAIL_STORAGE);
 
   return (
     <>
@@ -405,13 +455,4 @@ export function ChatWidget() {
       </button>
     </>
   );
-}
-
-/** SSR-safe localStorage read. */
-function localStorage_get(key: string): string | null {
-  try {
-    return typeof window === "undefined" ? null : localStorage.getItem(key);
-  } catch {
-    return null;
-  }
 }

@@ -1,6 +1,7 @@
 "use client";
 // Admin live-chat inbox — thread list + conversation pane. Polls (no sockets).
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Icon } from "@/components/primitives";
 import "@/components/chat/chat.css";
 
 const POLL_LIST_MS = 8_000;
@@ -34,6 +35,14 @@ function fmt(iso: string): string {
     : d.toLocaleDateString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
 }
 
+/** Append a poll page, deduping by id (cursor overlap is expected). */
+function mergeMessages(prev: Message[], page: Message[]): Message[] {
+  if (page.length === 0) return prev;
+  const seen = new Set(prev.map((m) => m.id));
+  const fresh = page.filter((m) => !seen.has(m.id));
+  return fresh.length === 0 ? prev : [...prev, ...fresh];
+}
+
 export function ChatConsole() {
   const [threads, setThreads] = useState<AdminThread[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -42,8 +51,16 @@ export function ChatConsole() {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const msgsRef = useRef<HTMLDivElement>(null);
+  // Guards against a slow response for thread A painting under thread B.
+  const activeIdRef = useRef<string | null>(null);
+  const messagesRef = useRef<Message[]>(messages);
+  messagesRef.current = messages;
 
   const active = threads.find((t) => t.id === activeId) ?? null;
+
+  const scrollToEnd = () => {
+    requestAnimationFrame(() => msgsRef.current?.scrollTo({ top: msgsRef.current.scrollHeight }));
+  };
 
   const loadThreads = useCallback(async () => {
     try {
@@ -56,19 +73,17 @@ export function ChatConsole() {
     }
   }, []);
 
-  const loadMessages = useCallback(async (id: string) => {
+  /** Incremental poll: only fetch messages newer than the last one we have. */
+  const loadMessages = useCallback(async (id: string, current: Message[]) => {
     try {
-      const res = await fetch(`/api/chat/threads/${id}/messages`);
+      const last = current[current.length - 1];
+      const qs = last ? `?after=${encodeURIComponent(last.createdAt)}` : "";
+      const res = await fetch(`/api/chat/threads/${id}/messages${qs}`);
       if (!res.ok) return;
       const data = (await res.json()) as { messages: Message[] };
-      setMessages((prev) => {
-        if (prev.length !== data.messages.length) {
-          requestAnimationFrame(() =>
-            msgsRef.current?.scrollTo({ top: msgsRef.current.scrollHeight })
-          );
-        }
-        return data.messages;
-      });
+      if (activeIdRef.current !== id) return; // admin switched threads mid-flight
+      setMessages((prev) => mergeMessages(prev, data.messages));
+      if (data.messages.length > 0) scrollToEnd();
     } catch {
       /* transient */
     }
@@ -76,16 +91,26 @@ export function ChatConsole() {
 
   useEffect(() => {
     loadThreads();
-    const t = setInterval(loadThreads, POLL_LIST_MS);
+    const t = setInterval(() => {
+      if (document.visibilityState === "hidden") return;
+      loadThreads();
+    }, POLL_LIST_MS);
     return () => clearInterval(t);
   }, [loadThreads]);
 
   useEffect(() => {
     if (!activeId) return;
+    activeIdRef.current = activeId;
     setMessages([]);
-    loadMessages(activeId);
-    const t = setInterval(() => loadMessages(activeId), POLL_THREAD_MS);
-    return () => clearInterval(t);
+    loadMessages(activeId, []);
+    const t = setInterval(() => {
+      if (document.visibilityState === "hidden") return;
+      loadMessages(activeId, messagesRef.current);
+    }, POLL_THREAD_MS);
+    return () => {
+      clearInterval(t);
+      activeIdRef.current = null;
+    };
   }, [activeId, loadMessages]);
 
   const reply = async () => {
@@ -105,7 +130,7 @@ export function ChatConsole() {
         return;
       }
       setDraft("");
-      await loadMessages(activeId);
+      await loadMessages(activeId, messagesRef.current);
     } catch {
       setError("Network error.");
     } finally {
@@ -224,6 +249,7 @@ export function ChatConsole() {
               <textarea
                 className="rd-chat-input"
                 placeholder="Reply…"
+                aria-label="Reply"
                 rows={2}
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
@@ -235,7 +261,7 @@ export function ChatConsole() {
                 }}
               />
               <button className="rd-chat-send" onClick={reply} disabled={!draft.trim() || sending} aria-label="Send reply">
-                ➤
+                <Icon name="send" size={17} />
               </button>
             </div>
             {error && <div className="rd-chat-error">{error}</div>}

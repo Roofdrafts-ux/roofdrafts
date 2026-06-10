@@ -2,9 +2,13 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSessionWithRole } from "@/lib/rbac";
 
-/** GET /api/admin/chat/threads — team inbox: open first, newest activity first. */
+/**
+ * GET /api/admin/chat/threads — team inbox: open first, newest activity first.
+ * ADMIN-gated to match every other /api/admin/* route and the proxy, which
+ * only lets ADMIN reach the /admin/chat UI.
+ */
 export async function GET() {
-  const session = await getSessionWithRole("ESTIMATOR");
+  const session = await getSessionWithRole("ADMIN");
   if (!session) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const threads = await prisma.chatThread.findMany({

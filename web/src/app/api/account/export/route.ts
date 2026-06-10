@@ -8,7 +8,7 @@ export async function GET() {
   if (!session?.user) return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
 
   const userId = session.user.id;
-  const [user, orders, memberships, consents] = await Promise.all([
+  const [user, orders, memberships, consents, chatThreads] = await Promise.all([
     prisma.user.findUnique({
       where: { id: userId },
       select: { id: true, email: true, name: true, role: true, accountType: true, companyName: true, monthlyVolume: true, createdAt: true },
@@ -27,9 +27,24 @@ export async function GET() {
       select: { type: true, createdAt: true, ipAddress: true },
       orderBy: { createdAt: "asc" },
     }),
+    prisma.chatThread.findMany({
+      where: { userId },
+      select: {
+        status: true,
+        name: true,
+        email: true,
+        pageUrl: true,
+        createdAt: true,
+        messages: {
+          select: { sender: true, body: true, createdAt: true },
+          orderBy: { createdAt: "asc" },
+        },
+      },
+      orderBy: { createdAt: "asc" },
+    }),
   ]);
 
-  const payload = { exportedAt: new Date().toISOString(), profile: user, orders, organizations: memberships, consents };
+  const payload = { exportedAt: new Date().toISOString(), profile: user, orders, organizations: memberships, consents, chatThreads };
   return new NextResponse(JSON.stringify(payload, null, 2), {
     headers: {
       "Content-Type": "application/json",

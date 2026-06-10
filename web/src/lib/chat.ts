@@ -5,6 +5,27 @@ export const CHAT_MAX_BODY = 2000;
 export const CHAT_MAX_NAME = 80;
 export const CHAT_MAX_EMAIL = 254;
 
+// Control chars that break Postgres text columns / email headers.
+// BODY_CONTROL keeps \n (U+000A) and \t (U+0009); FIELD_CONTROL strips all.
+// eslint-disable-next-line no-control-regex
+const BODY_CONTROL = /[\u0000-\u0008\u000B-\u001F\u007F]/g;
+// eslint-disable-next-line no-control-regex
+const FIELD_CONTROL = /[\u0000-\u001F\u007F]/g;
+
+/**
+ * Output-encode a string for interpolation into HTML (email templates).
+ * Input validators (cleanName etc.) are NOT HTML-safe — always encode at the
+ * point of output.
+ */
+export function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 /**
  * Visitor keys are browser-generated random ids (crypto.randomUUID). Accept a
  * conservative charset/length so junk or injection attempts are rejected early.
@@ -19,23 +40,26 @@ export function isValidVisitorKey(key: unknown): key is string {
  */
 export function cleanBody(body: unknown): string | null {
   if (typeof body !== "string") return null;
-  // eslint-disable-next-line no-control-regex
-  const t = body.replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, "").trim();
+  const t = body.replace(BODY_CONTROL, "").trim();
   if (!t) return null;
   return t.length > CHAT_MAX_BODY ? t.slice(0, CHAT_MAX_BODY) : t;
 }
 
-/** Loose email shape check — used for the optional guest contact field. */
+/**
+ * Loose email shape check — used for the optional guest contact field.
+ * Rejects angle brackets/quotes so the value can't smuggle markup-looking
+ * text (output is still escaped at every HTML sink regardless).
+ */
 export function cleanEmail(email: unknown): string | null {
   if (typeof email !== "string") return null;
-  const t = email.trim();
+  const t = email.replace(FIELD_CONTROL, "").trim();
   if (!t || t.length > CHAT_MAX_EMAIL) return null;
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(t) ? t : null;
+  return /^[^\s@<>"']+@[^\s@<>"']+\.[^\s@<>"']+$/.test(t) ? t : null;
 }
 
 export function cleanName(name: unknown): string | null {
   if (typeof name !== "string") return null;
-  const t = name.trim();
+  const t = name.replace(FIELD_CONTROL, "").trim();
   if (!t) return null;
   return t.length > CHAT_MAX_NAME ? t.slice(0, CHAT_MAX_NAME) : t;
 }
