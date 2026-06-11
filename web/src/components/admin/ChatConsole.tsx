@@ -2,6 +2,7 @@
 // Admin live-chat inbox — thread list + conversation pane. Polls (no sockets).
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Icon } from "@/components/primitives";
+import { initials, avatarBucket } from "@/lib/admin-format";
 import "@/components/chat/chat.css";
 
 const POLL_LIST_MS = 8_000;
@@ -174,12 +175,15 @@ export function ChatConsole() {
             style={activeId === t.id ? { background: "var(--nj2-bg-muted, #f4efe7)" } : undefined}
             onClick={() => setActiveId(t.id)}
           >
-            {t.unread > 0 && <span className="rd-chat-dot-unread" />}
+            <span className={`rd-avatar rd-av-${avatarBucket(t.email || t.id)}`}>
+              {initials(t.name, t.email || "v")}
+            </span>
             <div style={{ minWidth: 0, flex: 1 }}>
               <div style={{ fontSize: 13.5, fontWeight: 600, display: "flex", gap: 6, alignItems: "baseline" }}>
                 <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {t.name || t.email || "Anonymous visitor"}
                 </span>
+                {t.unread > 0 && <span className="rd-chat-dot-unread" style={{ alignSelf: "center" }} />}
                 {t.status === "CLOSED" && (
                   <span style={{ fontSize: 10, color: "var(--nj2-fg-4, #9b958a)", fontWeight: 500 }}>closed</span>
                 )}

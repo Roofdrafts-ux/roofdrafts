@@ -1,5 +1,5 @@
 import { requireRole } from "@/lib/auth-helpers";
-import { SignOutButton } from "@/components/dashboard/SignOutButton";
+
 import {
   REPORT_PRICES,
   formatUsd,
@@ -7,8 +7,9 @@ import {
   TURNAROUND_LABEL,
 } from "@/lib/pricing";
 import { COVERAGE } from "@/lib/coverage";
-import Link from "next/link";
+
 import "../admin.css";
+import { AdminNav } from "@/components/admin/AdminNav";
 
 export const metadata = { title: "Pricing & coverage — Roofdrafts admin" };
 
@@ -20,27 +21,7 @@ export default async function AdminPricingPage() {
 
   return (
     <div className="rd-admin">
-      <header className="rd-admin-header">
-        <div className="rd-admin-header-inner">
-          <Link href="/" className="rd-admin-brand">
-            <span className="rd-admin-brand-roof">roof</span>
-            <span className="rd-admin-brand-drafts">drafts</span>
-            <span className="rd-admin-tag">admin</span>
-          </Link>
-          <nav className="rd-admin-nav">
-            <Link href="/admin" className="rd-admin-navlink">Overview</Link>
-            <Link href="/admin/leads" className="rd-admin-navlink">Leads</Link>
-            <Link href="/admin/orders" className="rd-admin-navlink">Orders</Link>
-            <Link href="/admin/users" className="rd-admin-navlink">Users</Link>
-            <Link href="/admin/pricing" className="rd-admin-navlink rd-admin-navlink-active">Pricing</Link>
-            <Link href="/admin/billing" className="rd-admin-navlink">Billing</Link>
-            <Link href="/admin/settings" className="rd-admin-navlink">Settings</Link>
-            <Link href="/admin/audit" className="rd-admin-navlink">Audit</Link>
-            <span className="rd-admin-user">{session.user.name ?? session.user.email}</span>
-            <SignOutButton />
-          </nav>
-        </div>
-      </header>
+      <AdminNav active="pricing" user={session.user.name ?? session.user.email} />
 
       <main className="rd-admin-main">
         <h1 className="rd-admin-h1">Pricing &amp; coverage</h1>
