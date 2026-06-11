@@ -4,6 +4,7 @@ import { Suspense, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { RoofMark } from "@/components/primitives";
 
 export default function SignInPage() {
   return (
@@ -54,6 +55,7 @@ function SignInForm() {
       <div className="rd-auth-card">
         {/* Wordmark */}
         <div className="rd-auth-brand">
+          <RoofMark size={30} />
           <span className="rd-auth-brand-roof">roof</span>
           <span className="rd-auth-brand-drafts">drafts</span>
         </div>
@@ -115,6 +117,7 @@ function SignInForm() {
           Don't have an account?{" "}
           <Link href="/auth/signup" className="rd-auth-link">Create one</Link>
         </p>
+        <p className="rd-auth-trust">±2% accuracy · 50-state coverage · Xactimate-ready</p>
       </div>
     </div>
   );

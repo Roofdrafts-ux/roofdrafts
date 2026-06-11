@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SignOutButton } from "@/components/dashboard/SignOutButton";
+import { RoofMark } from "@/components/primitives";
 
 const LINKS: { href: string; label: string; key: string }[] = [
   { href: "/admin", label: "Overview", key: "overview" },
@@ -19,6 +20,7 @@ export function AdminNav({ active, user }: { active: string; user: string | null
     <header className="rd-admin-header">
       <div className="rd-admin-header-inner">
         <Link href="/" className="rd-admin-brand">
+          <RoofMark size={24} />
           <span className="rd-admin-brand-roof">roof</span>
           <span className="rd-admin-brand-drafts">drafts</span>
           <span className="rd-admin-tag">admin</span>

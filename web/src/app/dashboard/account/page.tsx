@@ -3,6 +3,7 @@ import { SignOutButton } from "@/components/dashboard/SignOutButton";
 import { AccountActions } from "@/components/dashboard/AccountActions";
 import Link from "next/link";
 import "../dashboard.css";
+import { RoofMark } from "@/components/primitives";
 
 export const metadata = { title: "Account — Roofdrafts" };
 export const dynamic = "force-dynamic";
@@ -14,6 +15,7 @@ export default async function AccountPage() {
       <header className="rd-dash-header">
         <div className="rd-dash-header-inner">
           <Link href="/dashboard" className="rd-dash-brand">
+            <RoofMark size={24} />
             <span className="rd-dash-brand-roof">roof</span>
             <span className="rd-dash-brand-drafts">drafts</span>
           </Link>

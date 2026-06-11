@@ -2,6 +2,7 @@
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { RoofMark } from "@/components/primitives";
 
 const MESSAGES: Record<string, string> = {
   Configuration: "There is a server configuration error.",
@@ -27,6 +28,7 @@ function AuthErrorInner() {
     <div className="rd-auth-shell">
       <div className="rd-auth-card">
         <div className="rd-auth-brand">
+          <RoofMark size={30} />
           <span className="rd-auth-brand-roof">roof</span>
           <span className="rd-auth-brand-drafts">drafts</span>
         </div>

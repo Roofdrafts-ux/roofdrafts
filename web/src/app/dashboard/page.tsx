@@ -8,6 +8,7 @@ import { RevisionButton } from "@/components/dashboard/RevisionButton";
 import Link from "next/link";
 import "./dashboard.css";
 import type { OrderStatus } from "@/generated/prisma/enums";
+import { RoofMark } from "@/components/primitives";
 
 export const metadata = { title: "Your reports — Roofdrafts" };
 export const dynamic = "force-dynamic";
@@ -51,6 +52,7 @@ export default async function DashboardPage() {
       <header className="rd-dash-header">
         <div className="rd-dash-header-inner">
           <Link href="/" className="rd-dash-brand">
+            <RoofMark size={24} />
             <span className="rd-dash-brand-roof">roof</span>
             <span className="rd-dash-brand-drafts">drafts</span>
           </Link>

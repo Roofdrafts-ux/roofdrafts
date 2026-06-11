@@ -10,11 +10,12 @@
   align-items: center;
   justify-content: center;
   padding: var(--nj2-s-6);
-  /* subtle grid paper background */
+  /* drafting-paper grid + the marketing hero's soft clay glow */
   background-image:
+    radial-gradient(ellipse 75% 50% at 50% -8%, var(--tp-accent-soft), transparent 62%),
     linear-gradient(var(--nj2-ink-100) 1px, transparent 1px),
     linear-gradient(90deg, var(--nj2-ink-100) 1px, transparent 1px);
-  background-size: 40px 40px;
+  background-size: 100% 100%, 40px 40px, 40px 40px;
 }
 
 .rd-auth-card {
@@ -200,3 +201,13 @@
   text-decoration: none;
 }
 .rd-auth-link:hover { text-decoration: underline; }
+
+/* ── Trust microcopy (brand voice, matches marketing hero) ── */
+.rd-auth-trust {
+  margin: 18px 0 0;
+  text-align: center;
+  font-family: var(--nj2-font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: var(--nj2-fg-4);
+}

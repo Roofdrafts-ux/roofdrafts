@@ -6,6 +6,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import "../../dashboard.css";
 import "../pay.css";
+import { RoofMark } from "@/components/primitives";
 
 export const metadata = { title: "Pay — Roofdrafts" };
 
@@ -30,6 +31,7 @@ export default async function PayPage({
       <header className="rd-dash-header">
         <div className="rd-dash-header-inner">
           <Link href="/dashboard" className="rd-dash-brand">
+            <RoofMark size={24} />
             <span className="rd-dash-brand-roof">roof</span>
             <span className="rd-dash-brand-drafts">drafts</span>
           </Link>

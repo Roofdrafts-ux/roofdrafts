@@ -7,6 +7,7 @@ import { SignOutButton } from "@/components/dashboard/SignOutButton";
 import Link from "next/link";
 import "./estimator.css";
 import type { OrderStatus } from "@/generated/prisma/enums";
+import { RoofMark } from "@/components/primitives";
 
 export const metadata = { title: "Production queue — Roofdrafts" };
 
@@ -43,6 +44,7 @@ export default async function EstimatorQueuePage() {
       <header className="rd-est-header">
         <div className="rd-est-header-inner">
           <Link href="/" className="rd-est-brand">
+            <RoofMark size={24} />
             <span className="rd-est-brand-roof">roof</span>
             <span className="rd-est-brand-drafts">drafts</span>
             <span className="rd-est-tag">estimator</span>

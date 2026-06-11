@@ -325,6 +325,12 @@ a { color: inherit; text-decoration: none; }
   * { animation-duration: .01ms !important; }
 }
 
+/* ───── brand lockups (consoles + auth) — align the RoofMark badge ───── */
+.rd-admin-brand, .rd-dash-brand, .rd-est-brand, .rd-auth-brand { align-items: center !important; }
+.rd-admin-brand > svg, .rd-dash-brand > svg, .rd-est-brand > svg, .rd-auth-brand > svg {
+  display: block; margin-right: 7px; flex-shrink: 0;
+}
+
 /* ───── nav link ───── */
 .tp-navlink { color: var(--nj2-fg-2); font-size: 14px; font-weight: 500; letter-spacing: -.005em;
   padding: 6px 10px; border-radius: 7px; cursor: pointer; transition: background .15s, color .15s;

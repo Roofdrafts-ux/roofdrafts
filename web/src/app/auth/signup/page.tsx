@@ -4,6 +4,7 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { RoofMark } from "@/components/primitives";
 
 type AccountType = "individual" | "company";
 const VOLUMES: { value: string; label: string }[] = [
@@ -87,6 +88,7 @@ export default function SignUpPage() {
       <div className="rd-auth-shell">
         <div className="rd-auth-card">
           <div className="rd-auth-brand">
+            <RoofMark size={30} />
             <span className="rd-auth-brand-roof">roof</span>
             <span className="rd-auth-brand-drafts">drafts</span>
           </div>
@@ -127,6 +129,7 @@ export default function SignUpPage() {
     <div className="rd-auth-shell">
       <div className="rd-auth-card">
         <div className="rd-auth-brand">
+          <RoofMark size={30} />
           <span className="rd-auth-brand-roof">roof</span>
           <span className="rd-auth-brand-drafts">drafts</span>
         </div>
@@ -278,6 +281,7 @@ export default function SignUpPage() {
           Already have an account?{" "}
           <Link href="/auth/signin" className="rd-auth-link">Sign in</Link>
         </p>
+        <p className="rd-auth-trust">±2% accuracy · 50-state coverage · Xactimate-ready</p>
       </div>
     </div>
   );
