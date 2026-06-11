@@ -16,6 +16,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      // Let "Continue with Google" attach to an existing email+password
+      // account with the same address. Despite the scary flag name this is
+      // safe for Google specifically: it only asserts emails it has verified,
+      // so the Google user provably owns the inbox. Without this, existing
+      // users who try Google get an opaque Configuration error.
+      allowDangerousEmailAccountLinking: true,
     }),
     Credentials({
       name: "Email & Password",
