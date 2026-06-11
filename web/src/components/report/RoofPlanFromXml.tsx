@@ -49,6 +49,8 @@ export function RoofPlanFromXml({
 
   const wFt = maxX - minX;
   const hFt = maxY - minY;
+  // Degenerate input (no points / zero width) would produce a NaN viewBox.
+  if (!isFinite(wFt) || wFt <= 0 || !isFinite(hFt) || hFt <= 0) return null;
   const VBW = 520;
   const drawW = VBW - padding * 2;
   const scale = drawW / wFt;

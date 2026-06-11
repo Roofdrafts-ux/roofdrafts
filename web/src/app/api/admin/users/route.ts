@@ -27,7 +27,8 @@ export async function POST(req: NextRequest) {
 
   const email = cleanEmail(typeof emailRaw === "string" ? emailRaw.toLowerCase() : null);
   const name = cleanName(nameRaw);
-  const role = typeof roleRaw === "string" && ROLES.has(roleRaw) ? roleRaw : "ESTIMATOR";
+  // Fail closed: an unrecognized role becomes CUSTOMER, never staff.
+  const role = typeof roleRaw === "string" && ROLES.has(roleRaw) ? roleRaw : "CUSTOMER";
   if (!email) return NextResponse.json({ error: "A valid email is required." }, { status: 400 });
 
   const existing = await prisma.user.findUnique({ where: { email } });
@@ -42,28 +43,40 @@ export async function POST(req: NextRequest) {
   const tempPassword = crypto.randomBytes(9).toString("base64url");
   const hash = await bcrypt.hash(tempPassword, 12);
 
-  const user = await prisma.user.create({
-    data: {
-      email,
-      name,
-      role: role as "CUSTOMER" | "ESTIMATOR" | "ADMIN",
-      accounts: {
-        create: {
-          type: "credentials",
-          provider: "credentials",
-          providerAccountId: email,
-          access_token: hash,
+  let user;
+  try {
+    user = await prisma.user.create({
+      data: {
+        email,
+        name,
+        role: role as "CUSTOMER" | "ESTIMATOR" | "ADMIN",
+        accounts: {
+          create: {
+            type: "credentials",
+            provider: "credentials",
+            providerAccountId: email,
+            access_token: hash,
+          },
+        },
+        // Org-of-one, same as self-serve signup.
+        memberships: {
+          create: {
+            role: "OWNER",
+            organization: { create: { name: name ?? email, type: "INDIVIDUAL" } },
+          },
         },
       },
-      // Org-of-one, same as self-serve signup.
-      memberships: {
-        create: {
-          role: "OWNER",
-          organization: { create: { name: name ?? email, type: "INDIVIDUAL" } },
-        },
-      },
-    },
-  });
+    });
+  } catch (e) {
+    // Race with a concurrent self-serve signup for the same email.
+    if ((e as { code?: string }).code === "P2002") {
+      return NextResponse.json(
+        { error: "An account with that email already exists — change their role in the table instead." },
+        { status: 409 }
+      );
+    }
+    throw e;
+  }
 
   await writeAudit({
     actorId: session.user.id,

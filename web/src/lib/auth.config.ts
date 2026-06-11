@@ -39,7 +39,9 @@ export const authConfig: NextAuthConfig = {
       // "/" must match exactly — startsWith("/") is true for every path and
       // would mark the whole site public. Other prefixes match on a path
       // boundary so e.g. "/pricing-internal" doesn't ride along with "/pricing".
-      const PUBLIC = ["/auth", "/legal", "/pricing", "/how-it-works", "/unauthorized", "/invite", "/report"];
+      // "/report/sample" is deliberately exact-ish: future /report/[orderId]
+      // pages must NOT inherit public access by prefix.
+      const PUBLIC = ["/auth", "/legal", "/pricing", "/how-it-works", "/unauthorized", "/invite", "/report/sample"];
       // Root-level metadata files (app/icon.svg, app/apple-icon.tsx, robots.ts,
       // sitemap.ts) are fetched by browsers/crawlers without a session.
       // Note: Next serves the apple icon at /apple-icon (no extension).

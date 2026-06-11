@@ -38,6 +38,15 @@ describe("proxy authorized() route protection", () => {
     });
   });
 
+  describe("non-public report pages", () => {
+    it("only /report/sample is public — future /report/[orderId] requires login", () => {
+      expect(authorized("/report/sample", null)).toBe(true);
+      expect(authorized("/report/sample/anything", null)).toBe(true);
+      expect(authorized("/report", null)).toBe(false);
+      expect(authorized("/report/cm123abc", null)).toBe(false);
+    });
+  });
+
   describe("API passthrough (handlers do their own auth and must return JSON)", () => {
     it("lets /api/* through even without a session", () => {
       expect(authorized("/api/orders", null)).toBe(true);

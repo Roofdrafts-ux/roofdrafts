@@ -4,6 +4,7 @@ import { getEmailer, notifyOrderEvent } from "./email";
 import { getBool, getEmails } from "./settings";
 import { TURNAROUND_LABEL } from "./pricing";
 import { escapeHtml } from "./chat";
+import { rateLimit } from "./rate-limit";
 import type { OrderEmailEvent } from "./email/types";
 
 const APP_URL = process.env.AUTH_URL ?? "http://localhost:3000";
@@ -48,6 +49,14 @@ export async function alertNewOrder(orderId: string): Promise<void> {
     let recipients = await getEmails("order_alert_emails");
     if (recipients.length === 0) recipients = await getEmails("lead_alert_emails");
     if (recipients.length === 0) return;
+
+    // Same per-instance ceiling pattern as chat alerts: an order-creation
+    // flood must not become a staff-inbox flood / email bill.
+    const cap = rateLimit("order:alerts:global", 30, 3_600_000);
+    if (!cap.ok) {
+      console.warn("[notify] new-order alert cap reached — suppressing staff email");
+      return;
+    }
 
     const order = await prisma.order.findUnique({
       where: { id: orderId },

@@ -65,7 +65,11 @@ export default async function AdminOrdersPage({
   const estimators = staff.map((s) => ({ id: s.id, label: s.name ?? s.email }));
   const labelById = new Map(estimators.map((e) => [e.id, e.label]));
   const wl = workload
-    .map((w) => ({ label: labelById.get(w.assignedEstimatorId ?? "") ?? "—", n: w._count._all }))
+    .map((w) => ({
+      id: w.assignedEstimatorId ?? "none",
+      label: labelById.get(w.assignedEstimatorId ?? "") ?? "—",
+      n: w._count._all,
+    }))
     .sort((a, b) => b.n - a.n);
 
   return (
@@ -85,7 +89,7 @@ export default async function AdminOrdersPage({
             <div className="rd-wl-n">{unassignedActive}</div>
           </div>
           {wl.map((w) => (
-            <div key={w.label} className="rd-wl">
+            <div key={w.id} className="rd-wl">
               <div className="rd-wl-label">{w.label}</div>
               <div className="rd-wl-n">{w.n}</div>
             </div>
@@ -112,6 +116,14 @@ export default async function AdminOrdersPage({
           })}
         </div>
 
+        {(() => {
+          const totalForFilter = filter ? (countByStatus.get(filter) ?? 0) : total;
+          return totalForFilter > orders.length ? (
+            <p className="rd-admin-note" style={{ marginTop: 0, marginBottom: 10 }}>
+              Showing the {orders.length} most recent of {totalForFilter} — use the status filters to narrow down.
+            </p>
+          ) : null;
+        })()}
         {orders.length === 0 ? (
           <div className="rd-empty-state">
             <p className="rd-empty-state-title">Nothing with this status</p>

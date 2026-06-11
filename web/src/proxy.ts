@@ -17,5 +17,5 @@ export const config = {
   // middleware wrap /api/auth/* makes it set a SECOND csrf cookie that
   // clobbers the route handler's — every credentials login then fails with
   // MissingCSRF in production.
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!api/|_next/static|_next/image|favicon.ico).*)"],
 };

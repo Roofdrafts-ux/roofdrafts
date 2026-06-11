@@ -57,6 +57,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
+    async signIn({ account, profile }) {
+      // Only link/sign in Google identities whose email Google has actually
+      // verified — the linking-by-email model depends on it. Some federated
+      // non-Gmail Google accounts can assert email_verified: false.
+      if (account?.provider === "google" && profile?.email_verified !== true) {
+        return false;
+      }
+      return true;
+    },
     async jwt({ token, user }) {
       if (user) token.id = user.id;
       // Re-read role from the DB on every call so role changes (promotions AND demotions)

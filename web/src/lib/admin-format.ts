@@ -5,6 +5,8 @@
 export function relTime(d: Date | string, now: Date = new Date()): string {
   const t = typeof d === "string" ? new Date(d) : d;
   const s = Math.round((now.getTime() - t.getTime()) / 1000);
+  // Future dates: show the absolute date instead of a misleading "just now".
+  if (s < -60) return t.toLocaleDateString("en-US", { month: "short", day: "numeric" });
   if (s < 60) return "just now";
   const m = Math.round(s / 60);
   if (m < 60) return `${m}m ago`;

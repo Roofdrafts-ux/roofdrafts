@@ -23,7 +23,7 @@ export default async function AdminDashboardPage() {
 
   const [
     totalOrders, weekOrders, delivered, grouped, recent,
-    paidAgg, billedAgg, openChats, unreadChats, overdue, unassigned,
+    paidAgg, unpaidAgg, openChats, unreadChats, overdue, unassigned,
   ] = await Promise.all([
     prisma.order.count(),
     prisma.order.count({ where: { createdAt: { gte: weekAgo } } }),
@@ -38,7 +38,7 @@ export default async function AdminDashboardPage() {
       include: { user: { select: { email: true, name: true } } },
     }),
     prisma.order.aggregate({ where: { paymentStatus: "PAID" }, _sum: { priceUsd: true } }),
-    prisma.order.aggregate({ where: { status: { not: "CANCELLED" } }, _sum: { priceUsd: true } }),
+    prisma.order.aggregate({ where: { paymentStatus: { not: "PAID" }, status: { not: "CANCELLED" } }, _sum: { priceUsd: true } }),
     prisma.chatThread.count({ where: { status: "OPEN" } }),
     prisma.chatThread.count({ where: { status: "OPEN", unreadForTeam: { gt: 0 } } }),
     prisma.order.findMany({
@@ -56,7 +56,8 @@ export default async function AdminDashboardPage() {
   ).length;
   const onTimePct = delivered.length === 0 ? null : Math.round((onTime / delivered.length) * 100);
   const paidUsd = paidAgg._sum.priceUsd ?? 0;
-  const outstandingUsd = Math.max(0, (billedAgg._sum.priceUsd ?? 0) - paidUsd);
+  // Exact: sum of not-yet-paid, not-cancelled orders (no subtraction games).
+  const outstandingUsd = unpaidAgg._sum.priceUsd ?? 0;
   const needsAttention = overdue.length > 0 || unreadChats > 0 || unassigned > 0;
 
   return (
@@ -142,7 +143,7 @@ export default async function AdminDashboardPage() {
             Pipeline <span className="rd-admin-count">{totalOrders} total</span>
           </h2>
           {totalOrders > 0 && (
-            <div className="rd-stackbar" role="img" aria-label="Order pipeline share by status">
+            <div className="rd-stackbar" role="group" aria-label="Order pipeline share by status — each segment links to filtered orders">
               {ALL_STATUSES.filter((s) => (countByStatus.get(s) ?? 0) > 0).map((s) => (
                 <Link
                   key={s}

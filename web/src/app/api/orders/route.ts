@@ -5,6 +5,7 @@ import { normalizeReportType, normalizeTurnaround, computeSlaDueAt, makeDisplayI
 import { getPrice } from "@/lib/pricing";
 import { notifyForOrder, alertNewOrder } from "@/lib/notify";
 import { getCurrentMembership } from "@/lib/org";
+import { rateLimit } from "@/lib/rate-limit";
 
 /** GET /api/orders — list the active org's orders (newest first). */
 export async function GET() {
@@ -30,6 +31,16 @@ export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
+  }
+
+  // Per-user cap: normal customers place a handful of orders an hour; a
+  // hostile account looping order creation floods staff inboxes instead.
+  const rl = rateLimit(`orders:create:${session.user.id}`, 15, 3_600_000);
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: "Too many orders in a short time — please wait a bit or contact support." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSec) } }
+    );
   }
 
   const body = await req.json().catch(() => null);
@@ -72,20 +83,25 @@ export async function POST(req: NextRequest) {
     priceUsd: getPrice(reportType, turn),
   };
 
-  // Customer-facing RD-##### number; retry the rare collision (unique
-  // constraint on displayId), then fall back to the schema default (cuid).
+  // Customer-facing RD-##### number; on the rare collision (unique
+  // constraint) retry, widening to 7 digits so the RD format is kept even
+  // when the 5-digit space gets crowded. The schema-default cuid remains a
+  // last-resort fallback that should be practically unreachable.
   let order = null;
-  for (let attempt = 0; attempt < 3 && !order; attempt++) {
+  for (let attempt = 0; attempt < 6 && !order; attempt++) {
     try {
-      order = await prisma.order.create({ data: { ...data, displayId: makeDisplayId() } });
+      order = await prisma.order.create({
+        data: { ...data, displayId: makeDisplayId(Math.random, attempt < 3 ? 5 : 7) },
+      });
     } catch (e) {
       if ((e as { code?: string }).code !== "P2002") throw e;
     }
   }
   if (!order) order = await prisma.order.create({ data });
 
-  // Best-effort emails (never block the response): customer confirmation +
-  // staff "new order" alert.
+  // Best-effort emails (errors are swallowed, but they do run before the
+  // response — on serverless, awaiting is what guarantees delivery):
+  // customer confirmation + staff "new order" alert.
   await notifyForOrder(order.id, "received");
   await alertNewOrder(order.id);
 
