@@ -102,6 +102,7 @@ export default async function AdminDashboardPage() {
         {/* KPI tiles */}
         <div className="rd-kpi-grid">
           <Kpi
+            href="/admin/orders"
             ico="orders"
             label="Orders"
             value={String(totalOrders)}
@@ -109,6 +110,7 @@ export default async function AdminDashboardPage() {
             icon={<IcoOrders />}
           />
           <Kpi
+            href="/admin/billing"
             ico="revenue"
             label="Revenue collected"
             value={fmtUsd(paidUsd)}
@@ -116,6 +118,7 @@ export default async function AdminDashboardPage() {
             icon={<IcoRevenue />}
           />
           <Kpi
+            href="/admin/orders?status=DELIVERED"
             ico="sla"
             label="On-time delivery"
             value={onTimePct === null ? "—" : `${onTimePct}%`}
@@ -124,6 +127,7 @@ export default async function AdminDashboardPage() {
             icon={<IcoSla />}
           />
           <Kpi
+            href="/admin/chat"
             ico="chat"
             label="Open chats"
             value={String(openChats)}
@@ -140,11 +144,13 @@ export default async function AdminDashboardPage() {
           {totalOrders > 0 && (
             <div className="rd-stackbar" role="img" aria-label="Order pipeline share by status">
               {ALL_STATUSES.filter((s) => (countByStatus.get(s) ?? 0) > 0).map((s) => (
-                <span
+                <Link
                   key={s}
+                  href={`/admin/orders?status=${s}`}
                   className={`rd-seg-${STATUS_META[s].tone}`}
                   style={{ flexGrow: countByStatus.get(s) ?? 0 }}
-                  title={`${STATUS_META[s].label}: ${countByStatus.get(s)}`}
+                  title={`${STATUS_META[s].label}: ${countByStatus.get(s)} — view orders`}
+                  aria-label={`${STATUS_META[s].label}: ${countByStatus.get(s)} orders`}
                 />
               ))}
             </div>
@@ -154,10 +160,14 @@ export default async function AdminDashboardPage() {
               const meta = STATUS_META[s];
               const n = countByStatus.get(s) ?? 0;
               return (
-                <div key={s} className={`rd-pipeline-cell ${n === 0 ? "rd-pipeline-cell-zero" : ""}`}>
+                <Link
+                  key={s}
+                  href={`/admin/orders?status=${s}`}
+                  className={`rd-pipeline-cell ${n === 0 ? "rd-pipeline-cell-zero" : ""}`}
+                >
                   <span className={`rd-badge rd-badge-${meta.tone}`}>{meta.label}</span>
                   <span className="rd-pipeline-n">{n}</span>
-                </div>
+                </Link>
               );
             })}
           </div>
@@ -226,7 +236,7 @@ export default async function AdminDashboardPage() {
 }
 
 function Kpi({
-  ico, label, value, sub, warn, icon,
+  ico, label, value, sub, warn, icon, href,
 }: {
   ico: string;
   label: string;
@@ -234,16 +244,17 @@ function Kpi({
   sub?: React.ReactNode;
   warn?: boolean;
   icon: React.ReactNode;
+  href: string;
 }) {
   return (
-    <div className="rd-kpi">
+    <Link href={href} className="rd-kpi">
       <div className="rd-kpi-top">
         <span className={`rd-kpi-ico rd-kpi-ico-${ico}`}>{icon}</span>
         <span className="rd-kpi-label">{label}</span>
       </div>
       <div className={`rd-kpi-value ${warn ? "rd-kpi-warn" : ""}`}>{value}</div>
       {sub && <div className="rd-kpi-sub">{sub}</div>}
-    </div>
+    </Link>
   );
 }
 
