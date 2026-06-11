@@ -117,28 +117,36 @@ export function RoofMark({ size = 30, light = false }: { size?: number; light?: 
       style={{ display: "block" }}
       aria-hidden="true"
     >
-      <rect x="1" y="1" width="30" height="30" rx="8.5" fill={badge} />
-      {/* gable — thick chevron band, square-cut eaves */}
-      <path d="M4.8 18.6 L16 7.4 L27.2 18.6 L23 18.6 L16 11.6 L9 18.6 Z" fill={ink} />
-      {/* ruler ticks etched into the right rafter band */}
+      <rect width="32" height="32" rx="9.3" fill={badge} />
+      {/* tongue (left, hollow outline) — open path so the apex has no miter spike */}
       <path
-        d="M17.6 11.7 l1.05 -1.05 M19.4 13.5 l1.05 -1.05 M21.2 15.3 l1.05 -1.05 M23 17.1 l1.05 -1.05"
+        d="M16 6 L4.6 18.4 L6.29 18.4 L14.94 9.75"
+        fill="none"
+        stroke={ink}
+        strokeWidth="0.7"
+        strokeLinejoin="bevel"
+      />
+      {/* solid ruler blade (right) — covers the apex joint */}
+      <path d="M16 6 L28.4 18.4 L23.59 18.4 L14.94 9.75 Z" fill={ink} />
+      {/* ruler ticks etched along the blade's inner edge */}
+      <path
+        d="M15.63 10.44 L16.3 9.77 M16.44 11.25 L17.11 10.58 M17.25 12.06 L18.45 10.85 M18.05 12.86 L18.73 12.19 M18.86 13.67 L19.53 13.0 M19.67 14.48 L20.34 13.81 M20.48 15.29 L21.68 14.08 M21.28 16.09 L21.96 15.42 M22.09 16.9 L22.76 16.23 M22.9 17.71 L23.57 17.04"
         fill="none"
         stroke={badge}
-        strokeWidth="0.75"
+        strokeWidth="0.42"
         strokeLinecap="round"
       />
       {/* apex point — the QA-verified signature */}
-      <circle cx="16" cy="15.6" r="1.9" fill={light ? "var(--tp-accent)" : "var(--nj2-lime)"} />
+      <circle cx="15" cy="14.4" r="1.6" fill={light ? "var(--tp-accent)" : "var(--nj2-lime)"} />
       {/* dimension line: end bars + outward arrowheads */}
       <path
-        d="M6.8 21.4 v3.2 M25.2 21.4 v3.2 M7.6 23 H24.4"
+        d="M5.8 20.7 v3.8 M26.2 20.7 v3.8 M6.7 22.6 H25.3"
         fill="none"
         stroke={ink}
-        strokeWidth="1.2"
+        strokeWidth="0.95"
         strokeLinecap="round"
       />
-      <path d="M7.3 23 l2.6 -1.2 v2.4 Z M24.7 23 l-2.6 -1.2 v2.4 Z" fill={ink} />
+      <path d="M6.3 22.6 l3.8 -0.9 v1.8 Z M25.7 22.6 l-3.8 -0.9 v1.8 Z" fill={ink} />
     </svg>
   );
 }
