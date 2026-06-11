@@ -27,6 +27,7 @@ describe("proxy authorized() route protection", () => {
       "/invite/some-token",
       "/report/sample",
       "/icon.svg",
+      "/apple-icon",
       "/apple-icon.png",
       "/favicon.ico",
       "/robots.txt",

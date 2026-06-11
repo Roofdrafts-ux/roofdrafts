@@ -101,8 +101,14 @@ export function Icon({
   );
 }
 
-/* ───────── Brand mark + wordmark ───────── */
+/* ───────── Brand mark + wordmark ─────────
+   "Carpenter's square roof" mark (Higgsfield concept #3, redrawn as exact
+   geometry): thick chevron band gable, clay ruler ticks etched on the right
+   rafter, amber point under the apex, arrowed dimension line below.
+   Keep icon.svg and apple-icon.tsx in sync with this geometry. */
 export function RoofMark({ size = 30, light = false }: { size?: number; light?: boolean }) {
+  const ink = light ? "var(--tp-accent)" : "#fff";
+  const badge = light ? "#fff" : "var(--tp-accent)";
   return (
     <svg
       width={size}
@@ -111,23 +117,28 @@ export function RoofMark({ size = 30, light = false }: { size?: number; light?: 
       style={{ display: "block" }}
       aria-hidden="true"
     >
-      <rect x="1" y="1" width="30" height="30" rx="8.5" fill={light ? "#fff" : "var(--tp-accent)"} />
+      <rect x="1" y="1" width="30" height="30" rx="8.5" fill={badge} />
+      {/* gable — thick chevron band, square-cut eaves */}
+      <path d="M4.8 18.6 L16 7.4 L27.2 18.6 L23 18.6 L16 11.6 L9 18.6 Z" fill={ink} />
+      {/* ruler ticks etched into the right rafter band */}
       <path
-        d="M7 19.5 L16 9 L25 19.5"
+        d="M17.6 11.7 l1.05 -1.05 M19.4 13.5 l1.05 -1.05 M21.2 15.3 l1.05 -1.05 M23 17.1 l1.05 -1.05"
         fill="none"
-        stroke={light ? "var(--tp-accent)" : "#fff"}
-        strokeWidth="2.1"
-        strokeLinejoin="round"
+        stroke={badge}
+        strokeWidth="0.75"
         strokeLinecap="round"
       />
+      {/* apex point — the QA-verified signature */}
+      <circle cx="16" cy="15.6" r="1.9" fill={light ? "var(--tp-accent)" : "var(--nj2-lime)"} />
+      {/* dimension line: end bars + outward arrowheads */}
       <path
-        d="M7.5 22.6 H24.5"
+        d="M6.8 21.4 v3.2 M25.2 21.4 v3.2 M7.6 23 H24.4"
         fill="none"
-        stroke={light ? "var(--tp-accent)" : "rgba(255,255,255,.55)"}
-        strokeWidth="1.6"
+        stroke={ink}
+        strokeWidth="1.2"
         strokeLinecap="round"
       />
-      <circle cx="16" cy="9" r="1.7" fill={light ? "var(--tp-accent)" : "var(--nj2-lime)"} />
+      <path d="M7.3 23 l2.6 -1.2 v2.4 Z M24.7 23 l-2.6 -1.2 v2.4 Z" fill={ink} />
     </svg>
   );
 }
