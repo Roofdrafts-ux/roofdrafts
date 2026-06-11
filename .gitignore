@@ -14,3 +14,7 @@ node_modules/
 
 # build artifacts / generated dumps
 _design_index.out
+
+# Local Netlify folder
+.netlify
+web/deno.lock
