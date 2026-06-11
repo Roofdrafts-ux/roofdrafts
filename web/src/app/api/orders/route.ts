@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { normalizeReportType, normalizeTurnaround, computeSlaDueAt, makeDisplayId } from "@/lib/orders";
 import { getPrice } from "@/lib/pricing";
-import { notifyForOrder } from "@/lib/notify";
+import { notifyForOrder, alertNewOrder } from "@/lib/notify";
 import { getCurrentMembership } from "@/lib/org";
 
 /** GET /api/orders — list the active org's orders (newest first). */
@@ -84,8 +84,10 @@ export async function POST(req: NextRequest) {
   }
   if (!order) order = await prisma.order.create({ data });
 
-  // Best-effort "order received" email (never blocks the response).
+  // Best-effort emails (never block the response): customer confirmation +
+  // staff "new order" alert.
   await notifyForOrder(order.id, "received");
+  await alertNewOrder(order.id);
 
   return NextResponse.json({ order }, { status: 201 });
 }

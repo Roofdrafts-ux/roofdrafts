@@ -44,6 +44,17 @@ export const SETTINGS: SettingDef[] = [
     placeholder: "support@roofdrafts.com",
   },
   {
+    key: "order_alert_emails",
+    label: "Order-alert recipients",
+    description:
+      "Comma-separated inboxes notified when any new order is placed. Falls back to the lead-alert recipients when empty.",
+    type: "emails",
+    group: "Notifications",
+    envFallback: "ORDER_ALERT_EMAILS",
+    default: "",
+    placeholder: "owner@roofdrafts.com",
+  },
+  {
     key: "order_emails_enabled",
     label: "Order lifecycle emails",
     description: "Email customers on order received / in-production / delivered.",
