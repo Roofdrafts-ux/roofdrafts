@@ -106,7 +106,7 @@ model User {
   updatedAt      DateTime        @updatedAt
 
   // Auth.js relations
-  accounts       AuthAccount[]
+  accounts       Account[]
   sessions       Session[]
 
   // App relations
@@ -119,7 +119,9 @@ model User {
   @@map("users")
 }
 
-model AuthAccount {
+/// NOTE: must be named `Account` — @auth/prisma-adapter calls prisma.account.*
+/// (renaming it broke Google OAuth with "undefined reading findUnique").
+model Account {
   id                String  @id @default(cuid())
   userId            String
   type              String

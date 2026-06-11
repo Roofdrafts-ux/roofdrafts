@@ -39,7 +39,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!user) return null;
 
         // Users created via OAuth won't have a password — check account type
-        const account = await prisma.authAccount.findFirst({
+        const account = await prisma.account.findFirst({
           where: { userId: user.id, provider: "credentials" },
         });
 
