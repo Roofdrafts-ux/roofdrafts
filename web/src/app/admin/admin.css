@@ -512,7 +512,10 @@ a.rd-pipeline-cell:hover .rd-pipeline-n { color: var(--nj2-brand-600); }
   .rd-kpi-grid { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 720px) {
-  .rd-admin-table { font-size: 12px; display: block; overflow-x: auto; }
+  /* Scroll the whole table as one unit, preserving column alignment, instead
+     of letting display:block collapse the table formatting context. */
+  .rd-admin-table { font-size: 12px; display: block; overflow-x: auto; min-width: 0; }
+  .rd-admin-table thead, .rd-admin-table tbody { display: table; width: 100%; min-width: 640px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .rd-admin-table tbody tr, .rd-admin-navlink, .rd-filter { transition: none; }

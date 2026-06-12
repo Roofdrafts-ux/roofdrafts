@@ -399,3 +399,8 @@
   display: grid;
   place-items: center;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .rd-chat-panel { animation: none; }
+  .rd-chat-launcher, .rd-chat-card, .rd-chat-list-item, .rd-chat-send, .rd-chat-tab, .rd-chat-iconbtn { transition: none; }
+}

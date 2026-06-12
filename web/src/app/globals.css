@@ -3,16 +3,14 @@
    Warm paper · ink · clay (roof-tile) accent · blueprint navy
    ================================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Hanken+Grotesk:wght@400;500;600;700&family=Inter:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@1,18..40,400;1,18..40,500&display=swap');
-
 :root {
-  /* ───── Fonts ───── */
-  --nj2-font-display: "Space Grotesk", system-ui, sans-serif;
-  --nj2-font-body:    "Hanken Grotesk", system-ui, sans-serif;
-  --nj2-font-mono:    "JetBrains Mono", ui-monospace, monospace;
-  --nj2-font-serif:   "Newsreader", Georgia, serif;
+  /* ───── Fonts (self-hosted via next/font; see app/layout.tsx) ───── */
+  --nj2-font-display: var(--font-display), "Space Grotesk", system-ui, sans-serif;
+  --nj2-font-body:    var(--font-body), "Hanken Grotesk", system-ui, sans-serif;
+  --nj2-font-mono:    var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+  --nj2-font-serif:   Georgia, serif;
   /* Logo wordmark — Inter (Stripe-style neo-grotesque) so the brand stands out. */
-  --nj2-font-logo:    "Inter", system-ui, sans-serif;
+  --nj2-font-logo:    var(--font-logo), "Inter", system-ui, sans-serif;
 
   /* ───── Warm paper neutral ramp ───── */
   --nj2-ink-0:   #FFFFFF;
@@ -76,8 +74,11 @@
   --nj2-bg-muted:    var(--nj2-ink-100);
   --nj2-fg-1:        var(--nj2-ink-900);
   --nj2-fg-2:        var(--nj2-ink-500);
-  --nj2-fg-3:        var(--nj2-ink-400);
-  --nj2-fg-4:        var(--nj2-ink-300);
+  /* fg-3/fg-4 decoupled from the ink ramp and darkened to clear WCAG AA
+     (≥4.5:1 on paper/card). The old ink-400/ink-300 muted greys measured
+     ~4.4 and ~2.5:1 — below the floor for body text and placeholders. */
+  --nj2-fg-3:        #6B6149; /* ~5.7:1 on page — secondary text, labels */
+  --nj2-fg-4:        #756A50; /* ~5.0:1 on page — meta, placeholders */
   --nj2-border:      var(--nj2-ink-150);
   --nj2-border-subtle: var(--nj2-ink-100);
   --nj2-border-strong: var(--nj2-ink-200);
@@ -401,3 +402,23 @@ textarea.tp-input { height: auto; padding: 12px 14px; resize: vertical; line-hei
   .tp-how-grid, .tp-fmt-grid, .tp-quote-grid, .tp-price-grid, .tp-stat-grid { grid-template-columns: 1fr !important; }
   .tp-foot-grid { grid-template-columns: 1fr 1fr !important; }
 }
+
+/* ── Skip-to-content (keyboard a11y) ── */
+.rd-skip-link {
+  position: absolute; left: 12px; top: -48px; z-index: 200;
+  background: var(--nj2-bg-card); color: var(--nj2-fg-1);
+  border: 1.5px solid var(--nj2-brand-500); border-radius: 8px;
+  padding: 8px 14px; font-size: 13.5px; font-weight: 600; text-decoration: none;
+  transition: top .15s ease-out;
+}
+.rd-skip-link:focus { top: 12px; outline: none; box-shadow: var(--tp-accent-ring) 0 0 0 3px; }
+
+/* ── Skeleton loading (streamed console fallbacks) ── */
+.rd-skel { background: var(--nj2-bg-muted); border-radius: 8px; position: relative; overflow: hidden; }
+.rd-skel::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent);
+  transform: translateX(-100%); animation: rdShimmer 1.4s ease-in-out infinite;
+}
+@keyframes rdShimmer { 100% { transform: translateX(100%); } }
+@media (prefers-reduced-motion: reduce) { .rd-skel::after { animation: none; } }

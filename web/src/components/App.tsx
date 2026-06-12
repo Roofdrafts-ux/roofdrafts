@@ -31,17 +31,20 @@ export function App() {
 
   return (
     <div>
+      <a href="#content" className="rd-skip-link">Skip to content</a>
       <Nav onOrder={openOrder} />
-      <Hero onOrder={openOrder} headline="Accurate roof diagrams," variant="default" />
-      <TrustBar />
-      <HowItWorks onOrder={openOrder} />
-      <Formats />
-      <SLA onOrder={openOrder} />
-      <Coverage />
-      <Testimonials />
-      <Pricing onOrder={openOrder} />
-      <FAQ />
-      <CTAFooter onOrder={openOrder} />
+      <main id="content">
+        <Hero onOrder={openOrder} headline="Accurate roof diagrams," variant="default" />
+        <TrustBar />
+        <HowItWorks onOrder={openOrder} />
+        <Formats />
+        <SLA onOrder={openOrder} />
+        <Coverage />
+        <Testimonials />
+        <Pricing onOrder={openOrder} />
+        <FAQ />
+        <CTAFooter onOrder={openOrder} />
+      </main>
 
       <OrderFlow open={orderOpen} onClose={() => setOrderOpen(false)} />
 

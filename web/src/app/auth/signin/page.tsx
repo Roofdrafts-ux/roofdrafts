@@ -105,7 +105,7 @@ function SignInForm() {
             />
           </label>
 
-          {error && <p className="rd-auth-error">{error}</p>}
+          {error && <p className="rd-auth-error" role="alert">{error}</p>}
 
           <button
             type="submit"

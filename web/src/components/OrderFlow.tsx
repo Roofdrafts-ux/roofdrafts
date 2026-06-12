@@ -4,6 +4,7 @@
 // Steps: Address → Report → Details → Review → (modeling) → Confirmed
 // ════════════════════════════════════════════════════════════════
 import React, { useState, useRef, useEffect } from "react";
+import { useFocusTrap } from "@/lib/use-focus-trap";
 import { Icon, RoofMark } from "./primitives";
 import { RoofPlanCompact } from "./RoofPlan";
 
@@ -26,7 +27,8 @@ type TurnMeta = { label: string; time: string; icon: string; sub: string };
 export function OrderFlow({ open, onClose }: { open: boolean; onClose: () => void }) {
   const STEPS = ["Address", "Report", "Details", "Review"];
   const [step, setStep] = useState(0);
-  const [phase, setPhase] = useState<"form" | "modeling" | "done">("form");
+  const [phase, setPhase] = useState<"form" | "modeling" | "done" | "error">("form");
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [data, setData] = useState<OrderData>({
     address: "",
     city: "",
@@ -42,6 +44,8 @@ export function OrderFlow({ open, onClose }: { open: boolean; onClose: () => voi
   const [touched, setTouched] = useState(false);
   const reportId = useRef("RD-" + Math.floor(48000 + Math.random() * 1900));
   const scrollRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(open, cardRef);
 
   useEffect(() => {
     if (open) {
@@ -125,6 +129,8 @@ export function OrderFlow({ open, onClose }: { open: boolean; onClose: () => voi
 
   const submit = async () => {
     setPhase("modeling");
+    setSubmitError(null);
+    const startedAt = Date.now();
     try {
       const res = await fetch("/api/orders", {
         method: "POST",
@@ -146,15 +152,26 @@ export function OrderFlow({ open, onClose }: { open: boolean; onClose: () => voi
         return;
       }
 
-      if (res.ok) {
-        const { order } = await res.json();
-        if (order?.displayId) reportId.current = order.displayId;
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        setSubmitError(
+          (d as { error?: string }).error ??
+            "We couldn't place your order. Please try again."
+        );
+        setPhase("error");
+        return;
       }
+
+      const { order } = await res.json();
+      if (order?.displayId) reportId.current = order.displayId;
     } catch {
-      /* network error — still show confirmation; order can be retried */
+      setSubmitError("Network problem — your order wasn't placed. Please try again.");
+      setPhase("error");
+      return;
     }
-    // Keep the modeling animation visible briefly, then confirm.
-    setTimeout(() => setPhase("done"), 2900);
+    // Hold the modeling animation briefly for perceived work, then confirm.
+    const elapsed = Date.now() - startedAt;
+    setTimeout(() => setPhase("done"), Math.max(0, 2000 - elapsed));
   };
 
   return (
@@ -176,7 +193,11 @@ export function OrderFlow({ open, onClose }: { open: boolean; onClose: () => voi
       }}
     >
       <div
+        ref={cardRef}
         className="tp-card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="orderflow-title"
         style={{
           width: "min(880px, 100%)",
           maxHeight: "92vh",
@@ -200,6 +221,7 @@ export function OrderFlow({ open, onClose }: { open: boolean; onClose: () => voi
           <RoofMark size={26} />
           <div style={{ flex: 1 }}>
             <div
+              id="orderflow-title"
               style={{
                 fontFamily: "var(--nj2-font-display)",
                 fontWeight: 600,
@@ -751,6 +773,35 @@ export function OrderFlow({ open, onClose }: { open: boolean; onClose: () => voi
             onClose={close}
           />
         )}
+
+        {/* ERROR — order POST failed; let the user retry without losing input */}
+        {phase === "error" && (
+          <div style={{ padding: "44px 32px", textAlign: "center" }}>
+            <div
+              style={{
+                width: 52, height: 52, borderRadius: 999, margin: "0 auto 18px",
+                display: "grid", placeItems: "center",
+                background: "var(--nj2-danger-soft, #FBE9E7)", color: "var(--nj2-danger, #C0392B)",
+              }}
+            >
+              <Icon name="alert-circle" size={26} />
+            </div>
+            <h3 style={{ fontFamily: "var(--nj2-font-display)", fontSize: 19, fontWeight: 700, margin: "0 0 8px" }}>
+              Order not placed
+            </h3>
+            <p role="alert" style={{ fontSize: 14, color: "var(--nj2-fg-2)", margin: "0 auto 22px", maxWidth: 380, lineHeight: 1.55 }}>
+              {submitError}
+            </p>
+            <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
+              <button className="nj2-btn nj2-btn-secondary" onClick={() => setPhase("form")}>
+                Back to order
+              </button>
+              <button className="nj2-btn tp-btn-accent" onClick={submit}>
+                Try again
+              </button>
+            </div>
+          </div>
+        )}
       </div>
       <style>{`@keyframes tpFade{from{opacity:0}to{opacity:1}}@keyframes tpPop{from{opacity:0;transform:translateY(12px) scale(.985)}to{opacity:1;transform:none}}`}</style>
     </div>
@@ -816,6 +867,7 @@ function Field({
 function Err({ children }: { children: React.ReactNode }) {
   return (
     <div
+      role="alert"
       style={{
         display: "flex",
         alignItems: "center",

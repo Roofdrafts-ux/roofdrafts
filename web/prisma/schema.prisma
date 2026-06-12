@@ -120,6 +120,11 @@ model User {
   chatThreads    ChatThread[]
   authTokens     AuthToken[]
 
+  // Admin users list sorts by createdAt; staff lookups filter role; the
+  // leads board filters leadStatus.
+  @@index([createdAt])
+  @@index([role])
+  @@index([leadStatus])
   @@map("users")
 }
 
@@ -226,6 +231,14 @@ model Order {
   deliverables     Deliverable[]
   consentRecords   ConsentRecord[]
 
+  // Hot paths: admin lists sort by createdAt and filter/group by status;
+  // org/customer dashboards scope by org/user; assignment + SLA sweeps.
+  @@index([createdAt])
+  @@index([status])
+  @@index([organizationId])
+  @@index([userId])
+  @@index([assignedEstimatorId])
+  @@index([status, slaDueAt])
   @@map("orders")
 }
 

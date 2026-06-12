@@ -8,6 +8,7 @@
 // ════════════════════════════════════════════════════════════════
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Icon, Wordmark } from "../primitives";
+import { useFocusTrap } from "@/lib/use-focus-trap";
 import "./chat.css";
 
 const KEY_STORAGE = "rd_chat_key";
@@ -91,6 +92,8 @@ export function ChatWidget() {
 
   const msgsRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(open, panelRef);
   // Guards against a slow response for thread A painting under thread B.
   const activeThreadRef = useRef<string | null>(null);
 
@@ -262,7 +265,7 @@ export function ChatWidget() {
   return (
     <>
       {open && (
-        <div className="rd-chat-panel" role="dialog" aria-label="Roofdrafts live chat">
+        <div ref={panelRef} className="rd-chat-panel" role="dialog" aria-modal="true" aria-label="Roofdrafts live chat">
           {view === "home" && (
             <div className="rd-chat-home">
               <div style={{ display: "flex", justifyContent: "flex-end", padding: "10px 10px 0" }}>
@@ -273,7 +276,7 @@ export function ChatWidget() {
               <div className="rd-chat-home-head">
                 <Wordmark size={26} />
                 <h2 className="rd-chat-greeting">
-                  Hi there 👋
+                  Hi there <span aria-hidden="true">👋</span>
                   <br />
                   How can we help?
                 </h2>

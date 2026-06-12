@@ -95,7 +95,7 @@ function ResetForm() {
                   placeholder="••••••••"
                 />
               </label>
-              {error && <p className="rd-auth-error">{error}</p>}
+              {error && <p className="rd-auth-error" role="alert">{error}</p>}
               <button type="submit" className="nj2-btn nj2-btn-brand nj2-btn-lg rd-auth-submit" disabled={loading}>
                 {loading ? "Updating…" : "Update password"}
               </button>
