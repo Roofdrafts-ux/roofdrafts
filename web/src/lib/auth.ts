@@ -6,6 +6,7 @@ import Google from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
 import { authConfig } from "./auth.config";
+import { rateLimit, clientIp } from "./rate-limit";
 import type { Role } from "../generated/prisma/enums";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -29,8 +30,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials, request) {
         if (!credentials?.email || !credentials?.password) return null;
+
+        // Brute-force / credential-stuffing throttle, keyed on IP so it can't
+        // be abused to lock a victim's account. Best-effort (in-memory, per
+        // serverless instance); bcrypt cost 12 covers the rest. Fail open if
+        // the IP is unavailable rather than block all logins.
+        try {
+          const ip = clientIp(request.headers);
+          if (ip !== "unknown" && !rateLimit(`login:${ip}`, 20, 15 * 60_000).ok) {
+            return null; // surfaced as "invalid credentials"; no enumeration
+          }
+        } catch {
+          /* no request/headers — skip throttle */
+        }
 
         const user = await prisma.user.findUnique({
           where: { email: (credentials.email as string).trim().toLowerCase() },

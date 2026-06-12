@@ -45,7 +45,7 @@ export const authConfig: NextAuthConfig = {
       // Root-level metadata files (app/icon.svg, app/apple-icon.tsx, robots.ts,
       // sitemap.ts) are fetched by browsers/crawlers without a session.
       // Note: Next serves the apple icon at /apple-icon (no extension).
-      const PUBLIC_FILES = ["/favicon.ico", "/icon.svg", "/apple-icon", "/apple-icon.png", "/robots.txt", "/sitemap.xml"];
+      const PUBLIC_FILES = ["/favicon.ico", "/icon.svg", "/apple-icon", "/apple-icon.png", "/opengraph-image", "/robots.txt", "/sitemap.xml"];
       const isPublic =
         pathname === "/" ||
         PUBLIC.some((p) => pathname === p || pathname.startsWith(p + "/")) ||

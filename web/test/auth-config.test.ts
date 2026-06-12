@@ -29,6 +29,7 @@ describe("proxy authorized() route protection", () => {
       "/icon.svg",
       "/apple-icon",
       "/apple-icon.png",
+      "/opengraph-image",
       "/favicon.ico",
       "/robots.txt",
       "/sitemap.xml",
