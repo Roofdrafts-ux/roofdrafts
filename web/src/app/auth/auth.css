@@ -127,6 +127,12 @@
   color: var(--nj2-fg-1);
   font-family: var(--nj2-font-body);
 }
+.rd-field-label-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.rd-field-link { font-size: 12px; font-weight: 600; }
 
 .rd-input {
   width: 100%;

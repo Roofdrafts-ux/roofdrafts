@@ -90,7 +90,10 @@ function SignInForm() {
           </label>
 
           <label className="rd-field">
-            <span className="rd-field-label">Password</span>
+            <span className="rd-field-label-row">
+              <span className="rd-field-label">Password</span>
+              <Link href="/auth/forgot" className="rd-auth-link rd-field-link">Forgot?</Link>
+            </span>
             <input
               type="password"
               required

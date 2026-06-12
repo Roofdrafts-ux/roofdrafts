@@ -50,6 +50,8 @@ export async function POST(req: NextRequest) {
         email,
         name,
         role: role as "CUSTOMER" | "ESTIMATOR" | "ADMIN",
+        // Temp password is a handoff, not their chosen one — nudge a change.
+        mustChangePassword: true,
         accounts: {
           create: {
             type: "credentials",

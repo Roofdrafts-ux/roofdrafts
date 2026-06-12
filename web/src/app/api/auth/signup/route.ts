@@ -6,6 +6,7 @@ import { getEmailer } from "@/lib/email";
 import { getEmails, getSetting } from "@/lib/settings";
 import { writeAudit } from "@/lib/audit";
 import { createOrgForUser } from "@/lib/org";
+import { sendVerificationEmail } from "@/lib/account";
 
 const ACCOUNT_TYPES = new Set(["individual", "company"]);
 const VOLUMES = new Set(["1-5", "5-20", "20+"]);
@@ -146,6 +147,13 @@ export async function POST(req: NextRequest) {
       meta: { accountType: acct, companyName: company, monthlyVolume: volume, role },
       ip: ip === "unknown" ? null : ip,
     });
+
+    // Confirm-your-email link (best-effort; never blocks signup).
+    try {
+      await sendVerificationEmail({ id: user.id, email, name: name ?? null });
+    } catch (e) {
+      console.warn(`[signup] verification email failed: ${(e as Error).message}`);
+    }
 
     // Company signups → alert the team for immediate follow-up (best-effort).
     if (isCompany) {

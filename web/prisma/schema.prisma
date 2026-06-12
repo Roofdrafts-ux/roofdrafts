@@ -92,6 +92,9 @@ model User {
   name           String?
   image          String?
   role           Role            @default(CUSTOMER)
+  /// True for admin-created accounts handed a temporary password: the app
+  /// nudges them to set their own before normal use. Cleared on change.
+  mustChangePassword Boolean      @default(false)
   /// Self-reported segmentation captured at signup: "individual" | "company".
   accountType    String?
   /// Company name (when accountType = "company").
@@ -115,8 +118,32 @@ model User {
   consentRecords ConsentRecord[]
   memberships    OrganizationMember[]
   chatThreads    ChatThread[]
+  authTokens     AuthToken[]
 
   @@map("users")
+}
+
+enum AuthTokenType {
+  PASSWORD_RESET
+  EMAIL_VERIFY
+}
+
+/// Single-use, time-limited token for password reset and email verification.
+/// Only the SHA-256 hash of the token is stored; the raw token lives only in
+/// the emailed link, so a DB leak can't be replayed.
+model AuthToken {
+  id        String        @id @default(cuid())
+  userId    String
+  type      AuthTokenType
+  tokenHash String        @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime      @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type])
+  @@map("auth_tokens")
 }
 
 /// NOTE: must be named `Account` — @auth/prisma-adapter calls prisma.account.*
