@@ -5,6 +5,7 @@ import { formatUsd } from "@/lib/pricing";
 import { getCurrentMembership, orgAtLeast } from "@/lib/org";
 import { SignOutButton } from "@/components/dashboard/SignOutButton";
 import { RevisionButton } from "@/components/dashboard/RevisionButton";
+import { Icon } from "@/components/primitives";
 import Link from "next/link";
 import "./dashboard.css";
 import type { OrderStatus } from "@/generated/prisma/enums";
@@ -91,7 +92,7 @@ export default async function DashboardPage() {
 
         {orders.length === 0 ? (
           <div className="rd-dash-empty">
-            <div className="rd-dash-empty-mark">⌂</div>
+            <div className="rd-dash-empty-mark" aria-hidden="true"><Icon name="house" size={34} /></div>
             <p className="rd-dash-empty-text">
               Your delivered PDF, Xactimate ESX and XML files will appear here.
             </p>
