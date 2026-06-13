@@ -1,83 +1,14 @@
-"use client";
 // ════════════════════════════════════════════════════════════════
-// Roofdrafts — sections part 1: Nav, Hero, ReportFrame, TrustBar,
-//             HowItWorks, Formats
+// Roofdrafts — sections part 1: Hero, ReportFrame, TrustBar,
+//             HowItWorks, Formats (server components)
 // ════════════════════════════════════════════════════════════════
-import React, { useEffect, useState } from "react";
-import { Icon, Wordmark, Eyebrow, Reveal } from "./primitives";
+import React from "react";
+import { Icon, Eyebrow, Reveal } from "./primitives";
 import { RoofPlanHero, RoofPlanCompact } from "./RoofPlan";
 import { RoofPlanFromXml } from "./report/RoofPlanFromXml";
 import { RESIDENTIAL_ROOF, COMMERCIAL_ROOF } from "./report/sampleRoofs";
 import { computeRoof, commas, MODEL_CROSS_GABLE } from "@/lib/roofcalc";
-
-/* ───────── NAV ───────── */
-export function Nav({ onOrder }: { onOrder: () => void }) {
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const f = () => setScrolled(window.scrollY > 12);
-    window.addEventListener("scroll", f);
-    return () => window.removeEventListener("scroll", f);
-  }, []);
-  const links: [string, string][] = [
-    ["How it works", "#how"],
-    ["Reports", "#formats"],
-    ["Turnaround", "#sla"],
-    ["Coverage", "#coverage"],
-    ["Pricing", "#pricing"],
-    ["FAQ", "#faq"],
-  ];
-  return (
-    <header
-      style={{
-        position: "sticky",
-        top: 0,
-        zIndex: 60,
-        background: scrolled
-          ? "color-mix(in srgb, var(--nj2-bg-card) 82%, transparent)"
-          : "transparent",
-        backdropFilter: scrolled ? "blur(14px) saturate(1.4)" : "none",
-        WebkitBackdropFilter: scrolled ? "blur(14px) saturate(1.4)" : "none",
-        borderBottom: `1px solid ${scrolled ? "var(--nj2-border-subtle)" : "transparent"}`,
-        transition: "background .25s, border-color .25s",
-      }}
-    >
-      <div
-        style={{
-          maxWidth: 1280,
-          margin: "0 auto",
-          padding: "14px 28px",
-          display: "flex",
-          alignItems: "center",
-          gap: 12,
-        }}
-      >
-        <Wordmark size={42} />
-        <nav style={{ display: "flex", gap: 2, marginLeft: 8 }} className="tp-nav-desktop">
-          {links.map(([l, h]) => (
-            <a key={l} href={h} className="tp-navlink">
-              {l}
-            </a>
-          ))}
-        </nav>
-        <div style={{ flex: 1 }} />
-        <a
-          href="tel:+16823257399"
-          className="tp-navlink tp-nav-phone"
-          style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
-        >
-          <Icon name="phone" size={13} style={{ opacity: 0.6 }} /> (682) 325-7399
-        </a>
-        <a href="/auth/signin" className="tp-navlink tp-nav-auth">Sign in</a>
-        <a href="/auth/signup" className="nj2-btn nj2-btn-sm tp-nav-auth" style={{ background: "transparent", border: "1px solid var(--nj2-border-subtle, #d8d2c7)" }}>
-          Sign up
-        </a>
-        <button className="nj2-btn tp-btn-accent nj2-btn-sm" onClick={onOrder}>
-          Order a report <span style={{ opacity: 0.8 }}>→</span>
-        </button>
-      </div>
-    </header>
-  );
-}
+import { OrderButton } from "./marketing/OrderModalProvider";
 
 /* ───────── REPORT FRAME — hero centerpiece ───────── */
 export function ReportFrame() {
@@ -326,11 +257,9 @@ function FRow({ k, v }: { k: string; v: string }) {
 
 /* ───────── HERO ───────── */
 export function Hero({
-  onOrder,
   headline,
   variant,
 }: {
-  onOrder: () => void;
   headline: string;
   variant: string;
 }) {
@@ -418,9 +347,9 @@ export function Hero({
             flexWrap: "wrap",
           }}
         >
-          <button className="nj2-btn tp-btn-accent nj2-btn-lg" onClick={onOrder}>
+          <OrderButton className="nj2-btn tp-btn-accent nj2-btn-lg">
             Order a report <span style={{ opacity: 0.8 }}>→</span>
-          </button>
+          </OrderButton>
           <a className="nj2-btn nj2-btn-secondary nj2-btn-lg" href="#sample">
             <Icon name="file-text" size={15} style={{ color: "var(--tp-blue)" }} /> See a sample
             report
@@ -528,7 +457,7 @@ export function TrustBar() {
 }
 
 /* ───────── HOW IT WORKS ───────── */
-export function HowItWorks({ onOrder }: { onOrder: () => void }) {
+export function HowItWorks() {
   const steps = [
     {
       n: "01",
@@ -575,9 +504,9 @@ export function HowItWorks({ onOrder }: { onOrder: () => void }) {
             <Eyebrow>How it works</Eyebrow>
             <h2 className="tp-h2">From address to estimate-ready, while you finish your coffee.</h2>
           </div>
-          <button className="nj2-btn nj2-btn-secondary" onClick={onOrder}>
+          <OrderButton className="nj2-btn nj2-btn-secondary">
             Start an order <span style={{ opacity: 0.6 }}>→</span>
-          </button>
+          </OrderButton>
         </div>
         <div
           className="tp-how-grid"

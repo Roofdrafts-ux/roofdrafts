@@ -1,86 +1,31 @@
-"use client";
 // ════════════════════════════════════════════════════════════════
-// Roofdrafts — marketing app shell
+// Roofdrafts — marketing app shell (server component)
+// Static sections render on the server; the OrderModalProvider client
+// island owns the order-modal state, floating CTA, and chat widget.
 // ════════════════════════════════════════════════════════════════
-import React, { useState, useEffect } from "react";
-import { Icon } from "./primitives";
-import { Nav, Hero, TrustBar, HowItWorks, Formats } from "./Marketing";
-import { SLA, Coverage, Testimonials, Pricing, FAQ, CTAFooter } from "./Marketing2";
-import { OrderFlow } from "./OrderFlow";
-import { ChatWidget } from "./chat/ChatWidget";
+import { OrderModalProvider } from "./marketing/OrderModalProvider";
+import { Nav } from "./marketing/Nav";
+import { FAQ } from "./marketing/FAQ";
+import { Hero, TrustBar, HowItWorks, Formats } from "./Marketing";
+import { SLA, Coverage, Testimonials, Pricing, CTAFooter } from "./Marketing2";
 
 export function App() {
-  const [orderOpen, setOrderOpen] = useState(false);
-
-  // pin brand accent (Clay) + light theme
-  useEffect(() => {
-    const r = document.documentElement;
-    r.style.setProperty("--tp-accent", "#BE5630");
-    r.style.setProperty("--tp-accent-600", "#A2451F");
-    r.style.setProperty("--tp-accent-soft", "#FBECE4");
-    r.style.setProperty("--tp-accent-ring", "rgba(190,86,48,.30)");
-    r.setAttribute("data-theme", "light");
-  }, []);
-
-  // Deep-link: /?order=1 (e.g. the dashboard "Order a report" button) opens the modal directly.
-  useEffect(() => {
-    if (new URLSearchParams(window.location.search).get("order") === "1") setOrderOpen(true);
-  }, []);
-
-  const openOrder = () => setOrderOpen(true);
-
   return (
-    <div>
+    <OrderModalProvider>
       <a href="#content" className="rd-skip-link">Skip to content</a>
-      <Nav onOrder={openOrder} />
+      <Nav />
       <main id="content">
-        <Hero onOrder={openOrder} headline="Accurate roof diagrams," variant="default" />
+        <Hero headline="Accurate roof diagrams," variant="default" />
         <TrustBar />
-        <HowItWorks onOrder={openOrder} />
+        <HowItWorks />
         <Formats />
-        <SLA onOrder={openOrder} />
+        <SLA />
         <Coverage />
         <Testimonials />
-        <Pricing onOrder={openOrder} />
+        <Pricing />
         <FAQ />
-        <CTAFooter onOrder={openOrder} />
+        <CTAFooter />
       </main>
-
-      <OrderFlow open={orderOpen} onClose={() => setOrderOpen(false)} />
-
-      <ChatWidget />
-
-      {/* floating order button — stacked above the chat launcher */}
-      <button
-        onClick={openOrder}
-        aria-label="Order a report"
-        style={{
-          position: "fixed",
-          right: 22,
-          bottom: 90,
-          zIndex: 80,
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 9,
-          padding: "13px 20px",
-          borderRadius: 999,
-          border: "none",
-          cursor: "pointer",
-          color: "#fff",
-          background: "var(--tp-accent)",
-          fontFamily: "var(--nj2-font-body)",
-          fontWeight: 600,
-          fontSize: 14.5,
-          whiteSpace: "nowrap",
-          boxShadow:
-            "0 10px 30px -8px var(--tp-accent-ring), 0 4px 10px rgba(0,0,0,.12)",
-          transition: "transform .15s var(--nj2-ease-io)",
-        }}
-        onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-2px)")}
-        onMouseLeave={(e) => (e.currentTarget.style.transform = "none")}
-      >
-        <Icon name="ruler" size={17} /> Order a report
-      </button>
-    </div>
+    </OrderModalProvider>
   );
 }
