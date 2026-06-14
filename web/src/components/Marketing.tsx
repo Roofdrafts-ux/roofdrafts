@@ -489,7 +489,12 @@ export function HowItWorks() {
     },
   ];
   return (
-    <section id="how" style={{ padding: "92px 28px", scrollMarginTop: 70 }}>
+    <section
+      id="how"
+      data-theme="dark"
+      className="tp-band-blueprint"
+      style={{ padding: "92px 28px", scrollMarginTop: 70 }}
+    >
       <div style={{ maxWidth: "var(--tp-maxw)", margin: "0 auto" }}>
         <div
           style={{

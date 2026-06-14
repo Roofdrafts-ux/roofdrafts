@@ -270,6 +270,32 @@ input, textarea, select { caret-color: var(--nj2-brand-500); }
 }
 [data-theme="dark"] .tp-dotgrid { background-image: radial-gradient(circle, #232327 .9px, transparent .9px); }
 
+/* ───── blueprint band ─────
+   A full navy "drafting-table" section. Pair the element with data-theme="dark"
+   so every child var(--nj2-*) token flips to the blueprint palette automatically
+   (cards → navy, ink → light cyan, borders → navy). The class layers the cyan
+   grid + a clay/cyan corner glow on top. Clay stays the action color. */
+.tp-band-blueprint {
+  position: relative;
+  isolation: isolate;
+  /* Start inheritance from the light ink so text without an explicit color
+     (e.g. card titles) reads on navy, not the inherited dark-theme ink. */
+  color: var(--nj2-fg-1);
+  background:
+    linear-gradient(0deg,  rgba(191,228,239,.055) 1px, transparent 1px) 0 0 / 100% 27px,
+    linear-gradient(90deg, rgba(191,228,239,.055) 1px, transparent 1px) 0 0 / 27px 100%,
+    var(--tp-navy);
+  border-top: 1px solid var(--tp-navy-2);
+  border-bottom: 1px solid var(--tp-navy-2);
+}
+.tp-band-blueprint::before {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 52% 58% at 86% 6%, color-mix(in srgb, var(--tp-accent) 22%, transparent), transparent 60%),
+    radial-gradient(ellipse 48% 55% at 2% 100%, color-mix(in srgb, var(--tp-blueprint-line) 9%, transparent), transparent 58%);
+}
+.tp-band-blueprint > * { position: relative; z-index: 1; }
+
 /* ───── shared section primitives ───── */
 .tp-eyebrow {
   font-family: var(--nj2-font-mono); font-weight: 500; font-size: 11px;
