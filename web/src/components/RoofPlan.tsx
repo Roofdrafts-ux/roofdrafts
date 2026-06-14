@@ -125,6 +125,10 @@ export function RoofPlanReport({
         animation: "tpDraw 1.7s var(--nj2-ease) .15s forwards",
       }
     : {};
+  // Annotations ink in just as the linework lands. Uses @starting-style (see
+  // .tp-anno-reveal) so the RESTING state is visible — headless renderers and
+  // crawlers that never run the transition still see the labels, never blank.
+  const annoClass = animate ? "tp-anno-reveal" : undefined;
   const present = LINE_TYPES.filter((t) => m.byType[t] > 0.5);
 
   return (
@@ -172,7 +176,7 @@ export function RoofPlanReport({
             const cx = px(f.c[0]),
               cy = py(f.c[1]);
             return (
-              <g key={"l" + f.id} transform={`translate(${cx},${cy})`} style={{ pointerEvents: "none" }}>
+              <g key={"l" + f.id} transform={`translate(${cx},${cy})`} className={annoClass} style={{ pointerEvents: "none" }}>
                 <path d="M-9,4 L6,4 L6,-4 Z" fill="none" stroke={pal.key} strokeWidth="1.1" />
                 <text
                   x="10"
@@ -190,31 +194,33 @@ export function RoofPlanReport({
               </g>
             );
           })}
-        {/* overall dimensions */}
-        <DimAxis
-          x1={px(minX)}
-          y1={py(minY) + 22}
-          x2={px(maxX)}
-          y2={py(minY) + 22}
-          label={ftIn(wFt)}
-          color={pal.dim}
-          horizontal
-        />
-        <DimAxis
-          x1={px(maxX) + 22}
-          y1={py(maxY)}
-          x2={px(maxX) + 22}
-          y2={py(minY)}
-          label={ftIn(hFt)}
-          color={pal.dim}
-        />
-        {/* north arrow */}
-        <g transform={`translate(${VBW - 24},${28})`}>
-          <circle r="12" fill="none" stroke={pal.dim} strokeOpacity="0.5" strokeWidth="0.8" />
-          <path d="M0,-7 L2.8,3.5 L0,1.2 L-2.8,3.5 Z" fill={pal.label} />
-          <text y="-14" textAnchor="middle" fontFamily="var(--nj2-font-mono)" fontSize="8" fill={pal.dim}>
-            N
-          </text>
+        {/* overall dimensions + north arrow — ink in after the linework */}
+        <g className={annoClass}>
+          <DimAxis
+            x1={px(minX)}
+            y1={py(minY) + 22}
+            x2={px(maxX)}
+            y2={py(minY) + 22}
+            label={ftIn(wFt)}
+            color={pal.dim}
+            horizontal
+          />
+          <DimAxis
+            x1={px(maxX) + 22}
+            y1={py(maxY)}
+            x2={px(maxX) + 22}
+            y2={py(minY)}
+            label={ftIn(hFt)}
+            color={pal.dim}
+          />
+          {/* north arrow */}
+          <g transform={`translate(${VBW - 24},${28})`}>
+            <circle r="12" fill="none" stroke={pal.dim} strokeOpacity="0.5" strokeWidth="0.8" />
+            <path d="M0,-7 L2.8,3.5 L0,1.2 L-2.8,3.5 Z" fill={pal.label} />
+            <text y="-14" textAnchor="middle" fontFamily="var(--nj2-font-mono)" fontSize="8" fill={pal.dim}>
+              N
+            </text>
+          </g>
         </g>
       </svg>
 

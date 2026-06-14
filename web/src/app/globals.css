@@ -386,6 +386,19 @@ input, textarea, select { caret-color: var(--nj2-brand-500); }
 
 /* ───── diagram draw-in ───── */
 @keyframes tpDraw { to { stroke-dashoffset: 0; } }
+/* annotations (pitch labels, dimensions, north arrow) ink in once the linework
+   is drawn — the draftsman annotates after drawing. RESTING state is visible
+   (opacity:1); @starting-style supplies the from-0 only on first paint, so any
+   renderer that doesn't run the transition (crawlers, headless, frozen tabs)
+   still shows the labels — content is never gated behind the animation. */
+.tp-anno-reveal {
+  opacity: 1;
+  transition: opacity .6s var(--nj2-ease);
+  transition-delay: 1.3s;
+}
+@starting-style {
+  .tp-anno-reveal { opacity: 0; }
+}
 
 /* ───── marquee for coverage ───── */
 @keyframes tpMarquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
