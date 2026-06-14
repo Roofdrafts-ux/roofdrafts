@@ -5,7 +5,13 @@
 
 .rd-est {
   min-height: 100vh;
-  background: var(--nj2-bg-page);
+  /* faint engineering-paper grid (graphite on cream, ~2.5%); opaque cards/rows
+     sit on top so it only reads as texture in the margins. */
+  background-color: var(--nj2-bg-page);
+  background-image:
+    linear-gradient(rgba(21, 18, 13, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(21, 18, 13, 0.025) 1px, transparent 1px);
+  background-size: 30px 30px;
   color: var(--nj2-fg-1);
   font-family: var(--nj2-font-body);
 }
