@@ -10,10 +10,16 @@
   font-family: var(--nj2-font-body);
 }
 
-/* ── Header ── */
+/* ── Header — navy blueprint chrome (matches the report aesthetic: navy
+   drafting-table chrome over a warm-paper body). Carries data-theme="dark"
+   so child tokens (border, .rd-dash-user, the sign-out button) flip to the
+   blueprint palette automatically. ── */
 .rd-dash-header {
   border-bottom: 1px solid var(--nj2-border);
-  background: var(--nj2-bg-card);
+  background:
+    linear-gradient(0deg,  rgba(191,228,239,.045) 1px, transparent 1px) 0 0 / 100% 26px,
+    linear-gradient(90deg, rgba(191,228,239,.045) 1px, transparent 1px) 0 0 / 26px 100%,
+    var(--tp-navy);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -36,8 +42,9 @@
   letter-spacing: -0.022em;
   text-decoration: none;
 }
-.rd-dash-brand-roof   { color: var(--nj2-ink-900); }
-.rd-dash-brand-drafts { color: var(--nj2-ink-400); }
+/* On the navy header, fg tokens resolve light (via data-theme="dark"). */
+.rd-dash-brand-roof   { color: var(--nj2-fg-1); }
+.rd-dash-brand-drafts { color: var(--nj2-fg-3); }
 
 .rd-dash-header-right {
   display: flex;

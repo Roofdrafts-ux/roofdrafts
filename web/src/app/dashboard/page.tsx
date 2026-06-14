@@ -49,8 +49,8 @@ export default async function DashboardPage() {
 
   return (
     <div className="rd-dash">
-      {/* Header */}
-      <header className="rd-dash-header">
+      {/* Header — navy blueprint chrome (paper body below) */}
+      <header className="rd-dash-header" data-theme="dark">
         <div className="rd-dash-header-inner">
           <Link href="/" className="rd-dash-brand">
             <RoofMark size={24} />
