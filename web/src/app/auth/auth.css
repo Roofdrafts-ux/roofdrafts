@@ -5,17 +5,19 @@
 
 .rd-auth-shell {
   min-height: 100vh;
-  background: var(--nj2-bg-page);
+  background: var(--tp-navy);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: var(--nj2-s-6);
-  /* drafting-paper grid + the marketing hero's soft clay glow */
+  /* navy drafting table: cyan blueprint grid + clay/cyan glow. The white form
+     card floats on it like a sheet on a drawing board. */
   background-image:
-    radial-gradient(ellipse 75% 50% at 50% -8%, var(--tp-accent-soft), transparent 62%),
-    linear-gradient(var(--nj2-ink-100) 1px, transparent 1px),
-    linear-gradient(90deg, var(--nj2-ink-100) 1px, transparent 1px);
-  background-size: 100% 100%, 40px 40px, 40px 40px;
+    radial-gradient(ellipse 70% 48% at 50% -6%, color-mix(in srgb, var(--tp-accent) 26%, transparent), transparent 60%),
+    radial-gradient(ellipse 52% 50% at 2% 100%, color-mix(in srgb, var(--tp-blueprint-line) 9%, transparent), transparent 58%),
+    linear-gradient(rgba(191, 228, 239, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(191, 228, 239, 0.05) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
 }
 
 .rd-auth-card {
