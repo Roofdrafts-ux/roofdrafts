@@ -54,14 +54,17 @@
   border-radius: var(--nj2-r-2xl);
   border: 1px solid var(--nj2-border);
   background: var(--nj2-bg-card);
-  box-shadow: 0 40px 80px -24px rgba(15, 15, 17, 0.32), 0 16px 40px -22px rgba(15, 15, 17, 0.16);
+  box-shadow: 0 40px 80px -24px rgba(21, 18, 13, 0.32), 0 16px 40px -22px rgba(21, 18, 13, 0.16);
   overflow: hidden;
-  animation: rdChatPop 0.22s var(--nj2-ease-io);
+  /* Origin-aware: the panel grows out of the launcher it's anchored to (bottom-
+     right), not from its own center. ease-out because it's entering. */
+  transform-origin: bottom right;
+  animation: rdChatPop 0.24s var(--nj2-ease);
 }
 @keyframes rdChatPop {
   from {
     opacity: 0;
-    transform: translateY(14px) scale(0.98);
+    transform: translateY(14px) scale(0.96);
   }
   to {
     opacity: 1;

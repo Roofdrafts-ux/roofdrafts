@@ -105,10 +105,14 @@
   --nj2-ease:     cubic-bezier(.2,1,.3,1);
   --nj2-ease-io:  cubic-bezier(.4,0,.2,1);
   --nj2-dur-fast: 150ms; --nj2-dur-med: 240ms; --nj2-dur-slow: 420ms;
+
+  /* Native UI (scrollbars, form controls, autofill) renders in the light scheme. */
+  color-scheme: light;
 }
 
 /* ───── BLUEPRINT theme (the "dark" toggle becomes a blueprint) ───── */
 [data-theme="dark"] {
+  color-scheme: dark;
   --nj2-bg-page:     var(--tp-navy);
   --nj2-bg-card:     #103140;
   --nj2-bg-sunken:   var(--tp-navy-3);
@@ -169,8 +173,17 @@ body {
 .nj2-btn-secondary:hover { background:var(--nj2-bg-sunken); border-color:var(--nj2-fg-4); transform:translateY(-1px); }
 .nj2-btn-ghost { background:transparent; color:var(--nj2-fg-1); border-color:transparent; }
 .nj2-btn-ghost:hover { background:var(--nj2-bg-muted); }
+/* Tactile press: the button confirms it heard the tap. Snappy (110ms), overrides
+   the hover lift so press reads as "down". Placed after all :hover rules so equal
+   specificity resolves in its favour. */
+.nj2-btn:active { transform: scale(.97); transition-duration: 110ms; }
+.nj2-btn:disabled, .nj2-btn[aria-disabled="true"] { transform: none; }
 .nj2-btn-sm { height:32px; padding:0 13px; font-size:12.5px; border-radius:var(--nj2-r-sm); }
 .nj2-btn-lg { height:46px; padding:0 22px; font-size:15px; border-radius:var(--nj2-r-md); }
+/* Touch devices keep :hover stuck after a tap — don't let the lift/shadow persist. */
+@media (hover: none) {
+  .nj2-btn:hover { transform: none; }
+}
 
 /* ================================================================
    TRUEPITCH — utilities on top of the original token system
@@ -229,7 +242,13 @@ html, body {
 }
 a { color: inherit; text-decoration: none; }
 *:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--tp-accent-ring); border-radius: 4px; }
-::selection { background: var(--tp-accent-soft); }
+/* Brand-reinforcing color details: native controls (checkboxes/radios/range/
+   progress), the text caret, and selection all carry the clay accent instead of
+   the OS blue default. Selection pins an ink text color so contrast holds on the
+   tint. These compound — users feel the cohesion without naming it. */
+:root { accent-color: var(--nj2-brand-500); }
+::selection { background: var(--nj2-brand-100); color: var(--nj2-ink-900); }
+input, textarea, select { caret-color: var(--nj2-brand-500); }
 
 /* ───── graph-paper / blueprint grid ───── */
 .tp-graph {
@@ -301,6 +320,9 @@ a { color: inherit; text-decoration: none; }
 .tp-btn-accent { background: var(--tp-accent); color: #fff; border-color: var(--tp-accent); }
 .tp-btn-accent:hover { background: var(--tp-accent-600); border-color: var(--tp-accent-600);
   box-shadow: 0 8px 24px -8px var(--tp-accent-ring); transform: translateY(-1px); }
+/* Defined after the hover rule so the press wins on a hovered+pressed CTA. */
+.tp-btn-accent:active { transform: scale(.97); transition-duration: 110ms; }
+@media (hover: none) { .tp-btn-accent:hover { transform: none; box-shadow: none; } }
 
 /* ───── status dot pulse ───── */
 .tp-dot { width: 7px; height: 7px; border-radius: 999px; display: inline-block; position: relative; }
@@ -337,6 +359,7 @@ a { color: inherit; text-decoration: none; }
   padding: 6px 10px; border-radius: 7px; cursor: pointer; transition: background .15s, color .15s;
   white-space: nowrap; }
 .tp-navlink:hover { color: var(--nj2-fg-1); background: var(--nj2-bg-muted); }
+.tp-navlink:active { transform: scale(.97); }
 
 /* ───── input ───── */
 .tp-input {
