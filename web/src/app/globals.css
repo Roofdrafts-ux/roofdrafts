@@ -295,6 +295,28 @@ input, textarea, select { caret-color: var(--nj2-brand-500); }
     radial-gradient(ellipse 48% 55% at 2% 100%, color-mix(in srgb, var(--tp-blueprint-line) 9%, transparent), transparent 58%);
 }
 .tp-band-blueprint > * { position: relative; z-index: 1; }
+/* Drafting-sheet registration marks — a faint cyan crop-mark at each corner.
+   Pure decoration that earns its place: it reinforces the blueprint identity
+   without competing with content (low opacity, behind the z:1 content). */
+.tp-band-blueprint::after {
+  content: ""; position: absolute; inset: 18px; z-index: 0; pointer-events: none; opacity: .22;
+  background-repeat: no-repeat;
+  background-image:
+    linear-gradient(var(--tp-blueprint-line), var(--tp-blueprint-line)),
+    linear-gradient(var(--tp-blueprint-line), var(--tp-blueprint-line)),
+    linear-gradient(var(--tp-blueprint-line), var(--tp-blueprint-line)),
+    linear-gradient(var(--tp-blueprint-line), var(--tp-blueprint-line)),
+    linear-gradient(var(--tp-blueprint-line), var(--tp-blueprint-line)),
+    linear-gradient(var(--tp-blueprint-line), var(--tp-blueprint-line)),
+    linear-gradient(var(--tp-blueprint-line), var(--tp-blueprint-line)),
+    linear-gradient(var(--tp-blueprint-line), var(--tp-blueprint-line));
+  background-position:
+    top left, top left, top right, top right,
+    bottom left, bottom left, bottom right, bottom right;
+  background-size:
+    16px 1.5px, 1.5px 16px, 16px 1.5px, 1.5px 16px,
+    16px 1.5px, 1.5px 16px, 16px 1.5px, 1.5px 16px;
+}
 
 /* ───── shared section primitives ───── */
 .tp-eyebrow {

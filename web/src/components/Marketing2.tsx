@@ -180,13 +180,12 @@ export function Coverage() {
       }}
     >
       <div
-        className="tp-dotgrid"
         style={{
           position: "absolute",
           inset: 0,
-          opacity: 0.25,
-          background: "radial-gradient(circle, rgba(255,255,255,.08) .9px, transparent .9px)",
-          backgroundSize: "24px 24px",
+          opacity: 0.5,
+          background:
+            "linear-gradient(0deg, rgba(191,228,239,.06) 1px, transparent 1px) 0 0 / 100% 27px, linear-gradient(90deg, rgba(191,228,239,.06) 1px, transparent 1px) 0 0 / 27px 100%",
         }}
       />
       <div
@@ -495,11 +494,10 @@ export function Pricing() {
   return (
     <section
       id="pricing"
+      data-theme="dark"
+      className="tp-band-blueprint"
       style={{
         padding: "92px 28px",
-        background: "var(--nj2-bg-card)",
-        borderTop: "1px solid var(--nj2-border-subtle)",
-        borderBottom: "1px solid var(--nj2-border-subtle)",
         scrollMarginTop: 70,
       }}
     >
