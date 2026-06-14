@@ -17,7 +17,7 @@ const LINKS: { href: string; label: string; key: string }[] = [
 /** Shared admin header + nav. Pass the active section key. */
 export function AdminNav({ active, user }: { active: string; user: string | null | undefined }) {
   return (
-    <header className="rd-admin-header">
+    <header className="rd-admin-header" data-theme="dark">
       <div className="rd-admin-header-inner">
         <Link href="/" className="rd-admin-brand">
           <RoofMark size={24} />

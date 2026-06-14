@@ -13,9 +13,13 @@
 }
 
 /* ── Header (second neutral layer, distinct from content) ── */
+/* Navy blueprint chrome (data-theme="dark" on the header flips child tokens). */
 .rd-admin-header {
   border-bottom: 1px solid var(--nj2-border);
-  background: var(--nj2-bg-sunken);
+  background:
+    linear-gradient(0deg,  rgba(191,228,239,.045) 1px, transparent 1px) 0 0 / 100% 26px,
+    linear-gradient(90deg, rgba(191,228,239,.045) 1px, transparent 1px) 0 0 / 26px 100%,
+    var(--tp-navy);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -40,8 +44,8 @@
   letter-spacing: -0.022em;
   text-decoration: none;
 }
-.rd-admin-brand-roof   { color: var(--nj2-ink-900); }
-.rd-admin-brand-drafts { color: var(--nj2-ink-400); }
+.rd-admin-brand-roof   { color: var(--nj2-fg-1); }
+.rd-admin-brand-drafts { color: var(--nj2-fg-3); }
 .rd-admin-tag {
   margin-left: 8px;
   align-self: center;
@@ -50,8 +54,10 @@
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--nj2-info);
-  background: var(--nj2-info-soft);
+  /* cyan blueprint label on navy */
+  color: var(--tp-blueprint-line);
+  background: rgba(191, 228, 239, 0.1);
+  border: 1px solid rgba(191, 228, 239, 0.18);
   padding: 3px 8px;
   border-radius: var(--nj2-r-pill);
 }
@@ -66,11 +72,11 @@
   transition: background 150ms ease-out, color 150ms ease-out;
 }
 .rd-admin-navlink:hover { color: var(--nj2-fg-1); background: var(--nj2-bg-muted); }
-.rd-admin-navlink-active {
-  color: var(--nj2-brand-600);
-  background: var(--nj2-brand-50);
+.rd-admin-navlink-active,
+.rd-admin-navlink-active:hover {
+  color: #fff;
+  background: color-mix(in srgb, var(--tp-accent) 26%, transparent);
 }
-.rd-admin-navlink-active:hover { color: var(--nj2-brand-600); background: var(--nj2-brand-50); }
 .rd-admin-user { font-size: 12.5px; color: var(--nj2-fg-3); font-family: var(--nj2-font-mono); margin-left: 8px; }
 
 /* ── Main ── */

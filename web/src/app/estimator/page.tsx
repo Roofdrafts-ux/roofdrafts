@@ -41,7 +41,7 @@ export default async function EstimatorQueuePage() {
 
   return (
     <div className="rd-est">
-      <header className="rd-est-header">
+      <header className="rd-est-header" data-theme="dark">
         <div className="rd-est-header-inner">
           <Link href="/" className="rd-est-brand">
             <RoofMark size={24} />

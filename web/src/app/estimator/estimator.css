@@ -11,9 +11,13 @@
 }
 
 /* ── Header ── */
+/* Navy blueprint chrome (data-theme="dark" on the header flips child tokens). */
 .rd-est-header {
   border-bottom: 1px solid var(--nj2-border);
-  background: var(--nj2-bg-card);
+  background:
+    linear-gradient(0deg,  rgba(191,228,239,.045) 1px, transparent 1px) 0 0 / 100% 26px,
+    linear-gradient(90deg, rgba(191,228,239,.045) 1px, transparent 1px) 0 0 / 26px 100%,
+    var(--tp-navy);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -37,8 +41,8 @@
   letter-spacing: -0.022em;
   text-decoration: none;
 }
-.rd-est-brand-roof   { color: var(--nj2-ink-900); }
-.rd-est-brand-drafts { color: var(--nj2-ink-400); }
+.rd-est-brand-roof   { color: var(--nj2-fg-1); }
+.rd-est-brand-drafts { color: var(--nj2-fg-3); }
 .rd-est-tag {
   margin-left: 8px;
   font-family: var(--nj2-font-mono);
@@ -46,8 +50,10 @@
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--nj2-brand-500);
-  background: var(--nj2-brand-50);
+  /* cyan blueprint label on navy */
+  color: var(--tp-blueprint-line);
+  background: rgba(191, 228, 239, 0.1);
+  border: 1px solid rgba(191, 228, 239, 0.18);
   padding: 3px 8px;
   border-radius: var(--nj2-r-pill);
   align-self: center;
