@@ -775,7 +775,7 @@ export function CTAFooter() {
                 fontWeight: 500,
                 letterSpacing: ".16em",
                 textTransform: "uppercase",
-                color: "#70707A",
+                color: "#8AA6B0",
               }}
             >
               Get started
@@ -815,7 +815,7 @@ export function CTAFooter() {
             >
               Talk to an estimator
             </a>
-            <div style={{ fontFamily: "var(--nj2-font-mono)", fontSize: 11, color: "#4A4A52", textAlign: "center", marginTop: 4 }}>
+            <div style={{ fontFamily: "var(--nj2-font-mono)", fontSize: 11, color: "#9FB6BF", textAlign: "center", marginTop: 4 }}>
               On-time guarantee · 50-state coverage
             </div>
           </div>
@@ -840,7 +840,7 @@ export function CTAFooter() {
               style={{
                 fontFamily: "var(--nj2-font-mono)",
                 fontSize: 10.5,
-                color: "#4A4A52",
+                color: "#9FB6BF",
                 marginTop: 14,
                 lineHeight: 1.8,
               }}
