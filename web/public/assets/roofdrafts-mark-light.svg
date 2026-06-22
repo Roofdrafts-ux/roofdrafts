@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Roofdrafts">
+  <rect width="32" height="32" rx="9.3" fill="#FFFFFF"/>
+  <path d="M16 6 L4.6 18.4 L6.29 18.4 L14.94 9.75" fill="none" stroke="#BE5630" stroke-width="0.7" stroke-linejoin="bevel"/>
+  <path d="M16 6 L28.4 18.4 L23.59 18.4 L14.94 9.75 Z" fill="#BE5630"/>
+  <path d="M15.63 10.44 L16.3 9.77 M16.44 11.25 L17.11 10.58 M17.25 12.06 L18.45 10.85 M18.05 12.86 L18.73 12.19 M18.86 13.67 L19.53 13.0 M19.67 14.48 L20.34 13.81 M20.48 15.29 L21.68 14.08 M21.28 16.09 L21.96 15.42 M22.09 16.9 L22.76 16.23 M22.9 17.71 L23.57 17.04" fill="none" stroke="#FFFFFF" stroke-width="0.42" stroke-linecap="round"/>
+  <circle cx="15" cy="14.4" r="1.6" fill="#BE5630"/>
+  <path d="M5.8 20.7 v3.8 M26.2 20.7 v3.8 M6.7 22.6 H25.3" fill="none" stroke="#BE5630" stroke-width="0.95" stroke-linecap="round"/>
+  <path d="M6.3 22.6 l3.8 -0.9 v1.8 Z M25.7 22.6 l-3.8 -0.9 v1.8 Z" fill="#BE5630"/>
+</svg>
